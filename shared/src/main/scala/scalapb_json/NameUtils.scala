@@ -1,4 +1,4 @@
-package scalapb_playjson
+package scalapb_json
 
 object NameUtils {
   def snakeCaseToCamelCase(name: String, upperInitial: Boolean = false): String = {

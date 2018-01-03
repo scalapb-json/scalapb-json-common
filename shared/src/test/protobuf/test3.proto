@@ -32,8 +32,3 @@ message Wrapper {
   google.protobuf.StringValue  w_string = 8;
   google.protobuf.BytesValue   w_bytes  = 9;
 }
-
-message StructTest {
-  google.protobuf.NullValue nv = 1;
-  repeated google.protobuf.NullValue rep_nv = 2;
-}

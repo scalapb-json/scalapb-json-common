@@ -1,4 +1,4 @@
-package scalapb_playjson
+package scalapb_json
 
 import com.google.protobuf.TextFormat.ParseException
 import com.google.protobuf.timestamp.Timestamp

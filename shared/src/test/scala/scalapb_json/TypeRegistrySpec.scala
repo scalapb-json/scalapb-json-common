@@ -1,4 +1,4 @@
-package scalapb_playjson
+package scalapb_json
 
 import com.google.protobuf.wrappers.UInt64Value
 import jsontest.test3.{MyTest3, Test3Proto, Wrapper}

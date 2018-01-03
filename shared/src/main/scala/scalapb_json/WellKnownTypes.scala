@@ -1,9 +1,8 @@
-package scalapb_playjson
+package scalapb_json
 
 import java.text.ParseException
 
 import com.google.protobuf.duration.Duration
-import play.api.libs.json.JsString
 
 object WellKnownTypes {
   // Timestamp for "0001-01-01T00:00:00Z"
@@ -39,7 +38,7 @@ object WellKnownTypes {
     }
   }
 
-  def writeDuration(duration: com.google.protobuf.duration.Duration) = {
+  def writeDuration(duration: com.google.protobuf.duration.Duration): String = {
     checkValid(duration)
     val result = new StringBuilder
     val (seconds, nanos) = if (duration.seconds < 0 || duration.nanos < 0) {
@@ -53,7 +52,7 @@ object WellKnownTypes {
       result.append(formatNanos(nanos))
     }
     result.append("s")
-    JsString(result.result())
+    result.result()
   }
 
   def parseNanos(value: String) = {
