@@ -102,7 +102,7 @@ object ScalapbJsonCommon {
     }
   }
 
-  def jsonName(fd: FieldDescriptor) = {
+  def jsonName(fd: FieldDescriptor): String = {
     // protoc<3 doesn't know about json_name, so we fill it in if it's not populated.
     fd.asProto.jsonName.getOrElse(NameUtils.snakeCaseToCamelCase(fd.asProto.getName))
   }
