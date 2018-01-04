@@ -17,8 +17,29 @@ val unusedWarnings = Seq("-Ywarn-unused", "-Ywarn-unused-import")
 
 val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
+  .enablePlugins(BuildInfoPlugin)
   .settings(
-    commonSettings
+    commonSettings,
+    mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map { f =>
+      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
+      val buildInfoDir = "sbt-buildinfo"
+      val path = if (f.getAbsolutePath.contains(buildInfoDir)) {
+        (file(buildInfoPackage.value) / f
+          .relativeTo((sourceManaged in Compile).value / buildInfoDir)
+          .get
+          .getPath).getPath
+      } else {
+        f.relativeTo((sourceManaged in Compile).value).get.getPath
+      }
+      (f, path)
+    },
+    buildInfoPackage := "scalapb_json",
+    buildInfoObject := "ScalapbJsonCommonBuildInfo",
+    buildInfoKeys := Seq[BuildInfoKey](
+      "scalapbVersion" -> scalapbVersion,
+      scalaVersion,
+      version
+    )
   )
   .jvmSettings(
     PB.targets in Test := Seq(
