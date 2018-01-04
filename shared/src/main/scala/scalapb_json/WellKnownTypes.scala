@@ -18,7 +18,7 @@ object WellKnownTypes {
   val DURATION_SECONDS_MIN = -315576000000L
   val DURATION_SECONDS_MAX = 315576000000L
 
-  def checkValid(duration: com.google.protobuf.duration.Duration) = {
+  def checkValid(duration: com.google.protobuf.duration.Duration): Unit = {
     val secondsInRange = (duration.seconds >= DURATION_SECONDS_MIN &&
       duration.seconds <= DURATION_SECONDS_MAX)
     val nanosInRange = duration.nanos >= -999999999L && duration.nanos <= NANOS_PER_SECOND
@@ -27,7 +27,7 @@ object WellKnownTypes {
     require(secondsInRange && nanosInRange && sameSign, "Duration is not valid.")
   }
 
-  def formatNanos(nanos: Int) = {
+  def formatNanos(nanos: Int): String = {
     // Determine whether to use 3, 6, or 9 digits for the nano part.
     if (nanos % NANOS_PER_MILLISECOND == 0) {
       "%1$03d".format(nanos / NANOS_PER_MILLISECOND)
