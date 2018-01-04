@@ -27,7 +27,6 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
     ),
     libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion % "test",
-      "com.google.protobuf" % "protobuf-java" % protobufVersion % "protobuf"
     )
   )
   .jsSettings(
