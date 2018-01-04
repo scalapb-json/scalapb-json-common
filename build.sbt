@@ -51,6 +51,11 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
     )
   )
   .jsSettings(
+    scalacOptions += {
+      val a = (baseDirectory in LocalRootProject).value.toURI.toString
+      val g = "https://raw.githubusercontent.com/scalapb-json/scalapb-json-common/" + tagOrHash.value
+      s"-P:scalajs:mapSourceURI:$a->$g/"
+    },
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M12"
     ),
