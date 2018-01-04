@@ -14,16 +14,24 @@ object ScalapbJsonCommon {
     type T <: GeneratedMessage with Message[T]
   }
 
+  private[this] val PIntDefault = PInt(0)
+  private[this] val PLongDefault = PLong(0L)
+  private[this] val PFloatDefault = PFloat(0)
+  private[this] val PDoubleDefault = PDouble(0)
+  private[this] val PBooleanDefault = PBoolean(false)
+  private[this] val PStringDefault = PString("")
+  private[this] val PByteStringDefault = PByteString(ByteString.EMPTY)
+
   def defaultValue(fd: FieldDescriptor): PValue = {
     require(fd.isOptional)
     fd.scalaType match {
-      case ScalaType.Int => PInt(0)
-      case ScalaType.Long => PLong(0L)
-      case ScalaType.Float => PFloat(0)
-      case ScalaType.Double => PDouble(0)
-      case ScalaType.Boolean => PBoolean(false)
-      case ScalaType.String => PString("")
-      case ScalaType.ByteString => PByteString(ByteString.EMPTY)
+      case ScalaType.Int => PIntDefault
+      case ScalaType.Long => PLongDefault
+      case ScalaType.Float => PFloatDefault
+      case ScalaType.Double => PDoubleDefault
+      case ScalaType.Boolean => PBooleanDefault
+      case ScalaType.String => PStringDefault
+      case ScalaType.ByteString => PByteStringDefault
       case ScalaType.Enum(ed) => PEnum(ed.values(0))
       case ScalaType.Message(_) => throw new RuntimeException("No default value for message")
     }
