@@ -40,7 +40,7 @@ object WellKnownTypes {
 
   def writeDuration(duration: com.google.protobuf.duration.Duration): String = {
     checkValid(duration)
-    val result = new StringBuilder
+    val result = new java.lang.StringBuilder
     val (seconds, nanos) = if (duration.seconds < 0 || duration.nanos < 0) {
       result.append("-")
       (-duration.seconds, -duration.nanos)
@@ -52,7 +52,7 @@ object WellKnownTypes {
       result.append(formatNanos(nanos))
     }
     result.append("s")
-    result.result()
+    result.toString()
   }
 
   def parseNanos(value: String) = {

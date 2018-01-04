@@ -2,7 +2,7 @@ package scalapb_json
 
 object NameUtils {
   def snakeCaseToCamelCase(name: String, upperInitial: Boolean = false): String = {
-    val b = new StringBuilder()
+    val b = new java.lang.StringBuilder()
     @annotation.tailrec
     def inner(name: String, index: Int, capNext: Boolean): Unit = if (name.nonEmpty) {
       val (r, capNext2) = name.head match {

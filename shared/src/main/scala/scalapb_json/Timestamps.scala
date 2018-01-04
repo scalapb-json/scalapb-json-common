@@ -39,7 +39,7 @@ object Timestamps {
   def writeTimestamp(ts: Timestamp): String = {
     checkValid(ts)
 
-    val result = new StringBuilder
+    val result = new java.lang.StringBuilder
     val date = java.time.LocalDateTime.ofEpochSecond(ts.seconds, 0, java.time.ZoneOffset.UTC)
     result.append(timestampFormat.format(date))
     if (ts.nanos != 0) {
