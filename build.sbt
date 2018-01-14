@@ -15,7 +15,7 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused", "-Ywarn-unused-import")
 
-val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
+val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("."))
   .enablePlugins(BuildInfoPlugin)
   .settings(
@@ -47,8 +47,12 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
       scalapb.gen(javaConversions = true) -> (sourceManaged in Test).value
     ),
     libraryDependencies ++= Seq(
-      "com.google.protobuf" % "protobuf-java-util" % protobufVersion % "test",
+      "com.google.protobuf" % "protobuf-java-util" % protobufVersion % "test"
     )
+  )
+  .nativeSettings(
+    crossScalaVersions := Scala211 :: Nil,
+    nativeLinkStubs := true
   )
   .jsSettings(
     scalacOptions += {
@@ -58,7 +62,20 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
     },
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M12"
-    ),
+    )
+  )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    Seq((Compile, "main"), (Test, "test")).map {
+      case (x, y) =>
+        unmanagedSourceDirectories in x += {
+          baseDirectory.value.getParentFile / s"jvm_js/src/${y}/scala/"
+        }
+    }
+  )
+  .platformsSettings(JSPlatform, NativePlatform)(
+    unmanagedSourceDirectories in Compile += {
+      baseDirectory.value.getParentFile / "js_native/src/main/scala/"
+    },
     PB.targets in Test := Seq(
       scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
     )
@@ -97,9 +114,10 @@ lazy val commonSettings = Seq[Def.SettingsDefinition](
   PB.protoSources in Test := Seq(file("shared/src/test/protobuf")),
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion,
-    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion % "protobuf,test",
-    "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbVersion % "protobuf,test",
+    "com.lihaoyi" %%% "utest" % "0.6.3" % "test"
   ),
+  testFrameworks += new TestFramework("utest.runner.Framework"),
   pomExtra in Global := {
     <url>https://github.com/scalapb-json/scalapb-json-common</url>
       <scm>
@@ -152,6 +170,7 @@ lazy val commonSettings = Seq[Def.SettingsDefinition](
       },
       enableCrossBuild = true
     ),
+    releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; scalapbJsonCommonNative/publishSigned"),
     setNextVersion,
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"),
@@ -162,3 +181,20 @@ lazy val commonSettings = Seq[Def.SettingsDefinition](
 
 val scalapbJsonCommonJVM = scalapbJsonCommon.jvm
 val scalapbJsonCommonJS = scalapbJsonCommon.js
+val scalapbJsonCommonNative = scalapbJsonCommon.native
+
+val root = project
+  .in(file("."))
+  .settings(
+    commonSettings,
+    publishArtifact := false,
+    publish := {},
+    publishLocal := {},
+    PgpKeys.publishSigned := {},
+    PgpKeys.publishLocalSigned := {}
+  )
+  .aggregate(
+    scalapbJsonCommonJVM,
+    scalapbJsonCommonJS
+    // exclude Native on purpose
+  )

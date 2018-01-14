@@ -2,22 +2,25 @@ package scalapb_json
 
 import com.google.protobuf.wrappers.UInt64Value
 import jsontest.test3.{MyTest3, Test3Proto, Wrapper}
-import org.scalatest.{FlatSpec, MustMatchers, OptionValues}
+import utest._
 
-class TypeRegistrySpec extends FlatSpec with MustMatchers with OptionValues {
-  "addFile" should "add all messages in the file" in {
-    val reg = TypeRegistry().addFile(Test3Proto)
+object TypeRegistrySpec extends TestSuite {
 
-    reg.findType("type.googleapis.com/jsontest.MyTest3").value must be(MyTest3)
-    reg.findType("type.googleapis.com/jsontest.Wrapper").value must be(Wrapper)
-    reg.findType("type.googleapis.com/google.protobuf.UInt64Value").value must be(UInt64Value)
-    reg.findType("type.googleapis.com/something.else") must be(None)
-  }
+  val tests = Tests{
+    "addFile should add all messages in the file" - {
+      val reg = TypeRegistry().addFile(Test3Proto)
 
-  "addMessage" should "not add other messages from same file" in {
-    val reg = TypeRegistry().addMessage[MyTest3]
-    reg.findType("type.googleapis.com/jsontest.MyTest3").value must be(MyTest3)
-    reg.findType("type.googleapis.com/jsontest.Wrapper") must be(None)
+      assert(reg.findType("type.googleapis.com/jsontest.MyTest3") == Some(MyTest3))
+      assert(reg.findType("type.googleapis.com/jsontest.Wrapper") == Some(Wrapper))
+      assert(reg.findType("type.googleapis.com/google.protobuf.UInt64Value") == Some(UInt64Value))
+      assert(reg.findType("type.googleapis.com/something.else") == None)
+    }
+
+    "addMessage should not add other messages from same file" - {
+      val reg = TypeRegistry().addMessage[MyTest3]
+      assert(reg.findType("type.googleapis.com/jsontest.MyTest3") == Some(MyTest3))
+      assert(reg.findType("type.googleapis.com/jsontest.Wrapper") == None)
+    }
   }
 
 }

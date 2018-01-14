@@ -1,24 +1,26 @@
 package scalapb_json
 
-import org.scalatest.{FlatSpec, MustMatchers}
+import utest._
 
-class NameUtilsSpec extends FlatSpec with MustMatchers {
-  "snakeCaseToCamelCase" should "work for normal names" in {
-    NameUtils.snakeCaseToCamelCase("scala_pb") must be("scalaPb")
-    NameUtils.snakeCaseToCamelCase("foo_bar") must be("fooBar")
-    NameUtils.snakeCaseToCamelCase("foo_bar_123baz") must be("fooBar123Baz")
-    NameUtils.snakeCaseToCamelCase("foo_bar_123_baz") must be("fooBar123Baz")
-    NameUtils.snakeCaseToCamelCase("__foo_bar") must be("FooBar")
-    NameUtils.snakeCaseToCamelCase("_foo_bar") must be("FooBar")
-    NameUtils.snakeCaseToCamelCase("_scala_pb") must be("ScalaPb")
-    NameUtils.snakeCaseToCamelCase("foo__bar") must be("fooBar")
-    NameUtils.snakeCaseToCamelCase("123bar") must be("123Bar")
-    NameUtils.snakeCaseToCamelCase("123_bar") must be("123Bar")
-  }
+object NameUtilsSpec extends TestSuite {
+  val tests = Tests {
+    "snakeCaseToCamelCase should work for normal names" - {
+      assert(NameUtils.snakeCaseToCamelCase("scala_pb") == "scalaPb")
+      assert(NameUtils.snakeCaseToCamelCase("foo_bar") == "fooBar")
+      assert(NameUtils.snakeCaseToCamelCase("foo_bar_123baz") == "fooBar123Baz")
+      assert(NameUtils.snakeCaseToCamelCase("foo_bar_123_baz") == "fooBar123Baz")
+      assert(NameUtils.snakeCaseToCamelCase("__foo_bar") == "FooBar")
+      assert(NameUtils.snakeCaseToCamelCase("_foo_bar") == "FooBar")
+      assert(NameUtils.snakeCaseToCamelCase("_scala_pb") == "ScalaPb")
+      assert(NameUtils.snakeCaseToCamelCase("foo__bar") == "fooBar")
+      assert(NameUtils.snakeCaseToCamelCase("123bar") == "123Bar")
+      assert(NameUtils.snakeCaseToCamelCase("123_bar") == "123Bar")
+    }
 
-  "snakeCaseToCamelCase" should "work when already in camel case" in {
-    NameUtils.snakeCaseToCamelCase("fooBar") must be("fooBar")
-    NameUtils.snakeCaseToCamelCase("fooBar_baz") must be("fooBarBaz")
-    NameUtils.snakeCaseToCamelCase("FooBar") must be("fooBar")
+    "snakeCaseToCamelCase should work when already in camel case" - {
+      assert(NameUtils.snakeCaseToCamelCase("fooBar") == "fooBar")
+      assert(NameUtils.snakeCaseToCamelCase("fooBar_baz") == "fooBarBaz")
+      assert(NameUtils.snakeCaseToCamelCase("FooBar") == "fooBar")
+    }
   }
 }

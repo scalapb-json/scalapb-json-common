@@ -11,7 +11,7 @@ object Durations {
   def checkValid(duration: com.google.protobuf.duration.Duration): Unit = {
     val secondsInRange = (duration.seconds >= DURATION_SECONDS_MIN &&
       duration.seconds <= DURATION_SECONDS_MAX)
-    val nanosInRange = duration.nanos >= -999999999L && duration.nanos <= Timestamps.NANOS_PER_SECOND
+    val nanosInRange = duration.nanos >= -999999999L && duration.nanos <= WellKnownTypes.NANOS_PER_SECOND
     val sameSign =
       !((duration.seconds < 0 || duration.nanos < 0) && (duration.seconds > 0 || duration.nanos > 0))
     require(secondsInRange && nanosInRange && sameSign, "Duration is not valid.")
@@ -28,7 +28,7 @@ object Durations {
     result.append(seconds)
     if (nanos != 0) {
       result.append(".")
-      result.append(Timestamps.formatNanos(nanos))
+      result.append(WellKnownTypes.formatNanos(nanos))
     }
     result.append("s")
     result.toString()
