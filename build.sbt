@@ -1,4 +1,4 @@
-import com.trueaccord.scalapb.compiler.Version._
+import scalapb.compiler.Version._
 import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
@@ -96,8 +96,8 @@ lazy val commonSettings = Seq[Def.SettingsDefinition](
   PB.targets in Compile := Nil,
   PB.protoSources in Test := Seq(file("shared/src/test/protobuf")),
   libraryDependencies ++= Seq(
-    "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion,
-    "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion % "protobuf,test",
+    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion,
+    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion % "protobuf,test",
     "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
   ),
   pomExtra in Global := {

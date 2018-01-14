@@ -1,9 +1,8 @@
 package scalapb_json
 
 import com.google.protobuf.ByteString
-import com.trueaccord.scalapb._
-
-import _root_.scalapb.descriptors._
+import scalapb._
+import scalapb.descriptors._
 
 object ScalapbJsonCommon {
 

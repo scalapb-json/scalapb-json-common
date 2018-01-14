@@ -1,6 +1,6 @@
 package scalapb_json
 
-import com.trueaccord.scalapb._
+import scalapb._
 
 import ScalapbJsonCommon.GenericCompanion
 
