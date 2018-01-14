@@ -3,7 +3,6 @@ package scalapb_json
 import com.google.protobuf.ByteString
 import com.trueaccord.scalapb._
 
-import scala.language.existentials
 import _root_.scalapb.descriptors._
 
 object ScalapbJsonCommon {
