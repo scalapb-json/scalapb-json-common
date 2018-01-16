@@ -1,7 +1,5 @@
 package scalapb_json
 
-import java.text.ParseException
-
 import com.google.protobuf.duration.Duration
 
 object WellKnownTypes {
@@ -13,19 +11,19 @@ object WellKnownTypes {
   val NANOS_PER_SECOND = 1000000000
   val NANOS_PER_MILLISECOND = 1000000
   val NANOS_PER_MICROSECOND = 1000
-  val MILLIS_PER_SECOND = 1000
-  val MICROS_PER_SECOND = 1000000
-  val DURATION_SECONDS_MIN = -315576000000L
-  val DURATION_SECONDS_MAX = 315576000000L
 
-  def checkValid(duration: com.google.protobuf.duration.Duration): Unit = {
-    val secondsInRange = (duration.seconds >= DURATION_SECONDS_MIN &&
-      duration.seconds <= DURATION_SECONDS_MAX)
-    val nanosInRange = duration.nanos >= -999999999L && duration.nanos <= NANOS_PER_SECOND
-    val sameSign =
-      !((duration.seconds < 0 || duration.nanos < 0) && (duration.seconds > 0 || duration.nanos > 0))
-    require(secondsInRange && nanosInRange && sameSign, "Duration is not valid.")
-  }
+  @deprecated("will be removed", "")
+  val MILLIS_PER_SECOND = 1000
+  @deprecated("will be removed", "")
+  val MICROS_PER_SECOND = 1000000
+  @deprecated("will be removed. use Durations.DURATION_SECONDS_MIN", "")
+  val DURATION_SECONDS_MIN = Durations.DURATION_SECONDS_MIN
+  @deprecated("will be removed. use Durations.DURATION_SECONDS_MAX", "")
+  val DURATION_SECONDS_MAX = Durations.DURATION_SECONDS_MAX
+
+  @deprecated("will be removed. use Durations.checkValid", "")
+  def checkValid(duration: com.google.protobuf.duration.Duration): Unit =
+    Durations.checkValid(duration)
 
   def formatNanos(nanos: Int): String = {
     // Determine whether to use 3, 6, or 9 digits for the nano part.
@@ -38,59 +36,15 @@ object WellKnownTypes {
     }
   }
 
-  def writeDuration(duration: com.google.protobuf.duration.Duration): String = {
-    checkValid(duration)
-    val result = new java.lang.StringBuilder
-    val (seconds, nanos) = if (duration.seconds < 0 || duration.nanos < 0) {
-      result.append("-")
-      (-duration.seconds, -duration.nanos)
-    } else (duration.seconds, duration.nanos)
+  @deprecated("will be removed. use Durations.writeDuration", "")
+  def writeDuration(duration: com.google.protobuf.duration.Duration): String =
+    Durations.writeDuration(duration)
 
-    result.append(seconds)
-    if (nanos != 0) {
-      result.append(".")
-      result.append(formatNanos(nanos))
-    }
-    result.append("s")
-    result.toString()
-  }
+  @deprecated("will be removed. use Durations.parseNanos", "")
+  def parseNanos(value: String): Int =
+    Durations.parseNanos(value)
 
-  def parseNanos(value: String) = {
-    val h = value.take(9)
-    if (!h.forall(_.isDigit)) {
-      throw new ParseException("Invalid nanoseconds.", 0)
-    }
-    h.padTo(9, '0').toInt
-  }
-
-  def parseDuration(value: String): Duration = {
-    if (!value.endsWith("s")) {
-      throw new ParseException("Invalid duration string: " + value, 0)
-    }
-    val (negative, number) = if (value.startsWith("-")) {
-      (true, value.substring(1, value.length - 1))
-    } else (false, value.substring(0, value.length - 1))
-
-    val pointPosition = number.indexOf('.')
-    val (secondsStr, nanosStr) = if (pointPosition != -1) {
-      (number.substring(0, pointPosition), number.substring(pointPosition + 1))
-    } else {
-      (number, "")
-    }
-    val seconds = secondsStr.toLong
-    val nanos =
-      if (nanosStr.isEmpty) 0
-      else
-        parseNanos(nanosStr)
-
-    if (seconds < 0) {
-      throw new ParseException("Invalid duration string: " + value, 0)
-    }
-
-    // TODO(thesamet): normalizedDuration?
-
-    com.google.protobuf.duration.Duration(
-      seconds = if (negative) -seconds else seconds,
-      nanos = if (negative) -nanos else nanos)
-  }
+  @deprecated("will be removed. use Durations.parseDuration", "")
+  def parseDuration(value: String): Duration =
+    Durations.parseDuration(value)
 }
