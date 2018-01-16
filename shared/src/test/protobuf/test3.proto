@@ -3,7 +3,6 @@ syntax = "proto3";
 package jsontest;
 
 import "test.proto";
-import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
 
 message MyTest3 {
