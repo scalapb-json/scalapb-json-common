@@ -1,3 +1,5 @@
+addSbtPlugin("com.github.scalaprops" % "sbt-scalaprops" % "0.2.5")
+
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.6" exclude("org.scala-native", "sbt-crossproject"))
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")

@@ -1,6 +1,8 @@
 package scalapb_json
 
 import com.google.protobuf.ByteString
+import com.google.protobuf.field_mask.FieldMask
+
 import scalapb._
 import scalapb.descriptors._
 
@@ -111,5 +113,27 @@ object ScalapbJsonCommon {
   def jsonName(fd: FieldDescriptor): String = {
     // protoc<3 doesn't know about json_name, so we fill it in if it's not populated.
     fd.asProto.jsonName.getOrElse(NameUtils.snakeCaseToCamelCase(fd.asProto.getName))
+  }
+
+  def fieldMaskToJsonString(fieldMask: FieldMask): String = {
+    val buf = new java.lang.StringBuilder()
+    var first = true
+    fieldMask.paths.foreach{ path =>
+      if(!path.isEmpty) {
+        if(!first) {
+          buf.append(',')
+        }
+        NameUtils.lowerSnakeCaseToCamelCaseWithBuffer(path, buf)
+        first = false
+      }
+    }
+    buf.toString
+  }
+
+  def fieldMaskFromJsonString(value: String): FieldMask = {
+    val result = value.split(",").toIterator.withFilter(_.nonEmpty).map{ path =>
+      NameUtils.camelCaseToSnakeCase(path)
+    }.toList
+    FieldMask(result)
   }
 }
