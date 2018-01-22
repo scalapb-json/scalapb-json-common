@@ -59,6 +59,7 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M12"
     ),
+    scalapropsCoreSettings,
     PB.targets in Test := Seq(
       scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
     )
@@ -98,8 +99,11 @@ lazy val commonSettings = Seq[Def.SettingsDefinition](
   libraryDependencies ++= Seq(
     "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion,
     "com.trueaccord.scalapb" %%% "scalapb-runtime" % scalapbVersion % "protobuf,test",
+    "com.lihaoyi" %%% "utest" % "0.6.3" % "test",
+    "com.github.scalaprops" %%% "scalaprops" % "0.5.3" % "test",
     "org.scalatest" %%% "scalatest" % "3.0.4" % "test"
   ),
+  testFrameworks += new TestFramework("utest.runner.Framework"),
   pomExtra in Global := {
     <url>https://github.com/scalapb-json/scalapb-json-common</url>
       <scm>
