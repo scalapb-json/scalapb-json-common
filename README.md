@@ -6,12 +6,12 @@
 Include in your `build.sbt` file
 
 ```scala
-libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-common" % "0.1.1"
+libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-common" % "0.1.2"
 ```
 
 for scala-js
 
 ```scala
-libraryDependencies += "io.github.scalapb-json" %%% "scalapb-json-common" % "0.1.1"
+libraryDependencies += "io.github.scalapb-json" %%% "scalapb-json-common" % "0.1.2"
 ```
 
