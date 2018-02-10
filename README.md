@@ -15,3 +15,6 @@ for scala-js, scala-native
 libraryDependencies += "io.github.scalapb-json" %%% "scalapb-json-common" % "0.2.0-M2"
 ```
 
+### for ScalaPB 0.6.x
+
+see https://github.com/scalapb-json/scalapb-json-common/tree/0.1.x
