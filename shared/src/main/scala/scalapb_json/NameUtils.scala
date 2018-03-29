@@ -67,18 +67,22 @@ object NameUtils {
     }
 
     val array = name.split("\\_")
-    toLowerCase(array(0), buf)
+    if (array.length == 0) {
+      buf
+    } else {
+      toLowerCase(array(0), buf)
 
-    @annotation.tailrec
-    def loop(i: Int): Unit = {
-      if (i < array.length) {
-        toProperCase(array(i))
-        loop(i + 1)
+      @annotation.tailrec
+      def loop(i: Int): Unit = {
+        if (i < array.length) {
+          toProperCase(array(i))
+          loop(i + 1)
+        }
       }
-    }
 
-    loop(1)
-    buf
+      loop(1)
+      buf
+    }
   }
 
   def camelCaseToSnakeCase(str: String): String = {

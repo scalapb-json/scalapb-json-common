@@ -5,6 +5,8 @@ import com.google.common.base.CaseFormat
 
 object NameUtilsJVMTest extends Scalaprops {
 
+  override def param = super.param.copy(minSuccessful = 10000)
+
   // https://docs.oracle.com/javase/8/docs/api/java/lang/Character.html#isLowerCase-char-
   // https://docs.oracle.com/javase/8/docs/api/java/lang/Character.html#isUpperCase-char-
   private[this] val strGen: Gen[String] = Gen.genString(
