@@ -61,7 +61,7 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M12"
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M13"
     )
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
