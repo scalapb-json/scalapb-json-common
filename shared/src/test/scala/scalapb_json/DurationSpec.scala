@@ -8,7 +8,7 @@ object DurationSpec extends TestSuite {
 
   val durationProto = WellKnownTest(duration = Some(Duration(146, 3455)))
 
-  val tests = Tests{
+  val tests = Tests {
     "Duration serializer should work" - {
       assert(Durations.writeDuration(Duration(146, 3455)) == "146.000003455s")
       assert(Durations.writeDuration(Duration(146, 3455000)) == "146.003455s")

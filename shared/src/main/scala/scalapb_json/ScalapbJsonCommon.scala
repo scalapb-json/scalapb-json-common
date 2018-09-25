@@ -118,9 +118,9 @@ object ScalapbJsonCommon {
   def fieldMaskToJsonString(fieldMask: FieldMask): String = {
     val buf = new java.lang.StringBuilder()
     var first = true
-    fieldMask.paths.foreach{ path =>
-      if(!path.isEmpty) {
-        if(!first) {
+    fieldMask.paths.foreach { path =>
+      if (!path.isEmpty) {
+        if (!first) {
           buf.append(',')
         }
         NameUtils.lowerSnakeCaseToCamelCaseWithBuffer(path, buf)
@@ -131,9 +131,14 @@ object ScalapbJsonCommon {
   }
 
   def fieldMaskFromJsonString(value: String): FieldMask = {
-    val result = value.split(",").toIterator.withFilter(_.nonEmpty).map{ path =>
-      NameUtils.camelCaseToSnakeCase(path)
-    }.toList
+    val result = value
+      .split(",")
+      .toIterator
+      .withFilter(_.nonEmpty)
+      .map { path =>
+        NameUtils.camelCaseToSnakeCase(path)
+      }
+      .toList
     FieldMask(result)
   }
 }

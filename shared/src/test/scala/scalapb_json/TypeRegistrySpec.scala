@@ -6,7 +6,7 @@ import utest._
 
 object TypeRegistrySpec extends TestSuite {
 
-  val tests = Tests{
+  val tests = Tests {
     "addFile should add all messages in the file" - {
       val reg = TypeRegistry().addFile(Test3Proto)
 
