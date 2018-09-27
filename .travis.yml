@@ -16,6 +16,8 @@ before_cache:
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
 matrix:
   include:
+  - scala: 2.12.6
+    jdk: oraclejdk11
   - sudo: required
     env: SCALA_NATIVE
     before_install:
