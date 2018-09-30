@@ -3,7 +3,7 @@ sudo: false
 scala:
 - 2.10.7
 - 2.11.12
-- 2.12.6
+- 2.12.7
 jdk: oraclejdk8
 script:
 - sbt "scalafmtCheck" "test:scalafmtCheck" "scalafmtSbtCheck" "++ ${TRAVIS_SCALA_VERSION}! -v" test
@@ -16,7 +16,7 @@ before_cache:
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
 matrix:
   include:
-  - scala: 2.12.6
+  - scala: 2.12.7
     jdk: oraclejdk11
   - sudo: required
     env: SCALA_NATIVE
