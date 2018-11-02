@@ -10,7 +10,7 @@ addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0")
 
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "0.6.0")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.10")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.3")
 
