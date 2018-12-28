@@ -1,7 +1,7 @@
 package scalapb_json
 
 import com.google.protobuf.struct.{Struct, Value}
-import scalapb.{GeneratedMessageCompanion, GeneratedMessage, Message}
+import scalapb.GeneratedMessageCompanion
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -9,7 +9,6 @@ import scala.reflect.macros.blackbox
 abstract class ProtoMacrosCommon(val c: blackbox.Context) {
 
   import c.universe._
-
 
   def fromJsonOptImpl(json: c.Tree): c.Tree = {
     q"""try{

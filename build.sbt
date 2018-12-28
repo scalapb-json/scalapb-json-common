@@ -3,6 +3,7 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
+val scalatestVersion = "3.0.5"
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -15,7 +16,7 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
-val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
@@ -69,6 +70,7 @@ val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     // TODO enable in scala-native https://github.com/scalaprops/sbt-scalaprops/issues/4
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.5.5" % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
     Seq((Compile, "main"), (Test, "test")).map {
       case (x, y) =>
         unmanagedSourceDirectories in x += {
@@ -85,27 +87,46 @@ val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
-val macros = project.settings(
+lazy val macros = project.settings(
   commonSettings,
   name := UpdateReadme.scalapbJsonMacrosName,
   libraryDependencies ++= Seq(
+    "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
     scalaOrganization.value % "scala-reflect" % scalaVersion.value,
   ),
 )
 
-val macrosJava = project.settings(
-  commonSettings,
-  name := UpdateReadme.scalapbJsonMacrosJavaName,
-  libraryDependencies ++= Seq(
-    "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
+lazy val macrosJava = project
+  .settings(
+    commonSettings,
+    name := UpdateReadme.scalapbJsonMacrosJavaName,
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+      "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
+    )
   )
-).dependsOn(
-  macros
-)
+  .dependsOn(
+    macros,
+    coreJVM % "test->test",
+  )
+
+lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .settings(
+    commonSettings,
+    noPublish,
+  )
+  .configure(_ dependsOn (macros, macrosJava))
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+  )
+
+lazy val testsJVM = tests.jvm
+lazy val testsJS = tests.js
+lazy val testsNative = tests.native
 
 commonSettings
 
-val noPublish = Seq(
+lazy val noPublish = Seq(
   PgpKeys.publishLocalSigned := {},
   PgpKeys.publishSigned := {},
   publishLocal := {},
@@ -215,8 +236,9 @@ val root = project
   )
   .aggregate(
     coreJVM,
-    coreJS,
+    coreJS, // exclude Native on purpose
     macros,
-    macrosJava
-    // exclude Native on purpose
+    macrosJava,
+    testsJVM,
+    testsJS,
   )
