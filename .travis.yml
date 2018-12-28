@@ -22,4 +22,4 @@ matrix:
     before_install:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -
     script:
-    - sbt "scalafmtCheck" "test:scalafmtCheck" "scalafmtSbtCheck" scalapbJsonCommonNative/test
+    - sbt "scalafmtCheck" "test:scalafmtCheck" "scalafmtSbtCheck" coreNative/test testsNative/test
