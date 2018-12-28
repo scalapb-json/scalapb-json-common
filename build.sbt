@@ -3,6 +3,8 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
+val Scala212 = "2.12.8"
+val scalatestVersion = "3.0.5"
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -15,11 +17,12 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
-val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("."))
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     commonSettings,
+    name := UpdateReadme.scalapbJsonCommonName,
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map { f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
       val buildInfoDir = "sbt-buildinfo"
@@ -68,6 +71,7 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     // TODO enable in scala-native https://github.com/scalaprops/sbt-scalaprops/issues/4
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.5.5" % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
     Seq((Compile, "main"), (Test, "test")).map {
       case (x, y) =>
         unmanagedSourceDirectories in x += {
@@ -84,9 +88,57 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
+lazy val macros = project.settings(
+  commonSettings,
+  name := UpdateReadme.scalapbJsonMacrosName,
+  libraryDependencies ++= Seq(
+    "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+    scalaOrganization.value % "scala-reflect" % scalaVersion.value,
+  ),
+)
+
+lazy val macrosJava = project
+  .settings(
+    commonSettings,
+    name := UpdateReadme.scalapbJsonMacrosJavaName,
+    libraryDependencies ++= Seq(
+      "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+      "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
+    )
+  )
+  .dependsOn(
+    macros,
+    coreJVM % "test->test",
+  )
+
+lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .settings(
+    commonSettings,
+    noPublish,
+  )
+  .configure(_ dependsOn (macros, macrosJava))
+  .jvmSettings(
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-circe" % "0.4.0",
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-argonaut" % "0.3.0",
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-playjson" % "0.8.2",
+  )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+  )
+  .nativeSettings(
+    nativeLinkStubs := true,
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % "test",
+    crossScalaVersions := Scala211 :: Nil,
+    scalaVersion := Scala211,
+  )
+
+lazy val testsJVM = tests.jvm.dependsOn(coreJVM % "test->test")
+lazy val testsJS = tests.js
+lazy val testsNative = tests.native
+
 commonSettings
 
-val noPublish = Seq(
+lazy val noPublish = Seq(
   PgpKeys.publishLocalSigned := {},
   PgpKeys.publishSigned := {},
   publishLocal := {},
@@ -99,7 +151,7 @@ noPublish
 lazy val commonSettings = Def.settings(
   unmanagedResources in Compile += (baseDirectory in LocalRootProject).value / "LICENSE.txt",
   scalaVersion := Scala211,
-  crossScalaVersions := Seq("2.12.8", Scala211, "2.10.7"),
+  crossScalaVersions := Seq(Scala212, Scala211),
   scalacOptions ++= PartialFunction
     .condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v >= 11 => unusedWarnings
@@ -111,10 +163,9 @@ lazy val commonSettings = Def.settings(
   description := "Json/Protobuf convertors for ScalaPB",
   licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
   organization := "io.github.scalapb-json",
-  name := UpdateReadme.scalapbJsonCommonName,
   Project.inConfig(Test)(sbtprotoc.ProtocPlugin.protobufConfigSettings),
   PB.targets in Compile := Nil,
-  PB.protoSources in Test := Seq(file("shared/src/test/protobuf")),
+  PB.protoSources in Test := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbVersion % "protobuf,test",
@@ -172,7 +223,7 @@ lazy val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; scalapbJsonCommonNative/publishSigned"),
+    releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; coreNative/publishSigned"),
     setNextVersion,
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"),
@@ -181,9 +232,9 @@ lazy val commonSettings = Def.settings(
   )
 )
 
-val scalapbJsonCommonJVM = scalapbJsonCommon.jvm
-val scalapbJsonCommonJS = scalapbJsonCommon.js
-val scalapbJsonCommonNative = scalapbJsonCommon.native
+val coreJVM = core.jvm
+val coreJS = core.js
+val coreNative = core.native
 
 val root = project
   .in(file("."))
@@ -196,7 +247,10 @@ val root = project
     PgpKeys.publishLocalSigned := {}
   )
   .aggregate(
-    scalapbJsonCommonJVM,
-    scalapbJsonCommonJS
-    // exclude Native on purpose
+    coreJVM,
+    coreJS, // exclude Native on purpose
+    macros,
+    macrosJava,
+    testsJVM,
+    testsJS,
   )
