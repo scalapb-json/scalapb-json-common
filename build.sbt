@@ -3,6 +3,7 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
+val Scala212 = "2.12.8"
 val scalatestVersion = "3.0.5"
 
 val tagName = Def.setting {
@@ -21,6 +22,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .enablePlugins(BuildInfoPlugin)
   .settings(
     commonSettings,
+    crossScalaVersions := Seq(Scala212, Scala211, "2.10.7"),
     name := UpdateReadme.scalapbJsonCommonName,
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map { f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
@@ -113,6 +115,7 @@ lazy val macrosJava = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-circe" % "0.4.0",
     noPublish,
   )
   .configure(_ dependsOn (macros, macrosJava))
@@ -139,7 +142,7 @@ noPublish
 lazy val commonSettings = Def.settings(
   unmanagedResources in Compile += (baseDirectory in LocalRootProject).value / "LICENSE.txt",
   scalaVersion := Scala211,
-  crossScalaVersions := Seq("2.12.8", Scala211, "2.10.7"),
+  crossScalaVersions := Seq(Scala212, Scala211),
   scalacOptions ++= PartialFunction
     .condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v >= 11 => unusedWarnings

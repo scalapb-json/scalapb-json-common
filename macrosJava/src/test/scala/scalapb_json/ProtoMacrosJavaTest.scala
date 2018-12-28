@@ -1,6 +1,5 @@
 package scalapb_json
 
-import com.google.protobuf.InvalidProtocolBufferException
 import jsontest.test.MyTest
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
@@ -9,9 +8,9 @@ import scalapb_json.ProtoMacrosJava._
 class ProtoMacrosJavaTest extends FunSpec with Matchers {
   describe("ProtoMacrosJava") {
     it("fromJson") {
-      assert(MyTest.fromJson("{}") === MyTest())
+      assert(MyTest.fromJsonConstant("{}") === MyTest())
       assert(
-        MyTest.fromJson(
+        MyTest.fromJsonConstant(
           """{
             "hello" : "foo",
             "foobar" : 42

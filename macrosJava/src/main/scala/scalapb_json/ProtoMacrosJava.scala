@@ -20,7 +20,9 @@ object ProtoMacrosJava {
   implicit class ScalaBPMessageOps[A <: GeneratedMessage with Message[A]](
     val companion: GeneratedMessageCompanion[A]
   ) extends AnyVal {
-    def fromJson(json: String): A = macro ProtoMacrosJava.fromJsonImpl0[A]
+    def fromJsonConstant(json: String): A = macro ProtoMacrosJava.fromJsonConstantImpl0[A]
+
+    def fromJson(json: String): A = macro ProtoMacrosJava.fromJsonImpl[A]
 
     def fromJsonDebug(json: String): A = macro ProtoMacrosJava.fromJsonDebugImpl
 
@@ -46,12 +48,7 @@ class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommo
     builder.build()
   }
 
-  def fromJsonImpl[A <: GeneratedMessage with Message[A]: c.WeakTypeTag: GeneratedMessageCompanion](
-    string: String
-  ) = {
-    val q"$_($lhs)" = c.prefix.tree
-    val javaType = ProtoMacros.getJavaType(c)(lhs)
-    validate(string, javaType)
+  def fromJsonInternal(companion: c.Tree, json: c.Tree, javaType: Class[_]): c.Tree = {
     val packageAndOuter = javaType.getCanonicalName.split('.').init
     val p = packageAndOuter.map(TermName(_)).foldLeft(Ident(TermName("_root_")): Tree)(Select(_, _))
     val x = Select(p, TermName(javaType.getSimpleName))
@@ -59,9 +56,23 @@ class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommo
     q"""
       val $parser = _root_.com.google.protobuf.util.JsonFormat.parser()
       val $builder = $x.newBuilder()
-      $parser.merge($string, $builder)
-      $lhs.fromJavaProto($builder.build())
+      $parser.merge($json, $builder)
+      $companion.fromJavaProto($builder.build())
     """
+  }
+  override def fromJsonImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
+    val q"$_($companion)" = c.prefix.tree
+    val javaType = ProtoMacros.getJavaType(c)(companion)
+    fromJsonInternal(companion, json, javaType)
+  }
+
+  override def fromJsonConstantImpl[A <: GeneratedMessage with Message[A]: c.WeakTypeTag: GeneratedMessageCompanion](
+    string: String
+  ): c.Tree = {
+    val q"$_($companion)" = c.prefix.tree
+    val javaType = ProtoMacros.getJavaType(c)(companion)
+    validate(string, javaType)
+    fromJsonInternal(companion, Literal(Constant(string)), javaType)
   }
 
   override def protoString2Value(string: String): c.Tree = {

@@ -12,7 +12,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
 
   def fromJsonOptImpl(json: c.Tree): c.Tree = {
     q"""try{
-      _root_.scala.Some(${fromJsonImpl0(json)})
+      _root_.scala.Some(${fromJsonImpl(json)})
     } catch {
       case _: _root_.com.google.protobuf.InvalidProtocolBufferException =>
         _root_.scala.None
@@ -22,7 +22,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
   def fromJsonEitherImpl(json: c.Tree): c.Tree = {
     val error = TermName(c.freshName)
     q"""try{
-      _root_.scala.Right(${fromJsonImpl0(json)})
+      _root_.scala.Right(${fromJsonImpl(json)})
     } catch {
       case $error : _root_.com.google.protobuf.InvalidProtocolBufferException =>
         _root_.scala.Left($error)
@@ -32,7 +32,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
   def fromJsonTryImpl(json: c.Tree): c.Tree = {
     val error = TermName(c.freshName)
     q"""try{
-      _root_.scala.util.Success(${fromJsonImpl0(json)})
+      _root_.scala.util.Success(${fromJsonImpl(json)})
     } catch {
       case $error: _root_.com.google.protobuf.InvalidProtocolBufferException =>
         _root_.scala.util.Failure($error)
@@ -40,12 +40,12 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
   }
 
   def fromJsonDebugImpl(json: c.Tree): c.Tree = {
-    val code = fromJsonImpl0(json)
+    val code = fromJsonImpl(json)
     println(showCode(code))
     code
   }
 
-  def fromJsonImpl0[A <: scalapb.GeneratedMessage with scalapb.Message[A]: c.WeakTypeTag](
+  def fromJsonConstantImpl0[A <: scalapb.GeneratedMessage with scalapb.Message[A]: c.WeakTypeTag](
     json: c.Tree
   ): c.Tree = {
     val Literal(Constant(str: String)) = json
@@ -55,10 +55,12 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
         .getField(scala.reflect.NameTransformer.MODULE_INSTANCE_NAME)
         .get(null)
         .asInstanceOf[GeneratedMessageCompanion[A]]
-    fromJsonImpl[A](str)
+    fromJsonConstantImpl[A](str)
   }
 
-  def fromJsonImpl[
+  def fromJsonImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree
+
+  def fromJsonConstantImpl[
     A <: scalapb.GeneratedMessage with scalapb.Message[A]: c.WeakTypeTag: GeneratedMessageCompanion
   ](string: String): c.Tree
 
