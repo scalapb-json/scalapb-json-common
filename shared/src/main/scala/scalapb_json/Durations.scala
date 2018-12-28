@@ -70,6 +70,7 @@ object Durations {
 
     com.google.protobuf.duration.Duration(
       seconds = if (negative) -seconds else seconds,
-      nanos = if (negative) -nanos else nanos)
+      nanos = if (negative) -nanos else nanos
+    )
   }
 }

@@ -8,7 +8,7 @@ import scalapb.descriptors._
 
 object ScalapbJsonCommon {
 
-  def unsignedInt(n: Int): Long = n & 0x00000000FFFFFFFFL
+  def unsignedInt(n: Int): Long = n & 0X00000000FFFFFFFFL
 
   type GenericCompanion = GeneratedMessageCompanion[T] forSome {
     type T <: GeneratedMessage with Message[T]
@@ -81,7 +81,7 @@ object ScalapbJsonCommon {
   def parseUint32(value: String): PValue = {
     try {
       val result = value.toLong
-      if (result < 0 || result > 0xFFFFFFFFl)
+      if (result < 0 || result > 0XFFFFFFFFL)
         throw new JsonFormatException(s"Out of range uint32 value: $value")
       return PInt(result.toInt)
     } catch {
@@ -89,7 +89,7 @@ object ScalapbJsonCommon {
       case _: Exception => // Fall through.
     }
     parseBigDecimal(value).toBigIntExact().map { intVal =>
-      if (intVal < 0 || intVal > 0xFFFFFFFFl)
+      if (intVal < 0 || intVal > 0XFFFFFFFFL)
         throw new JsonFormatException(s"Out of range uint32 value: $value")
       PLong(intVal.intValue())
     } getOrElse {

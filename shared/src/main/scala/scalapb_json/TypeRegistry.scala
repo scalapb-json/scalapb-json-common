@@ -10,9 +10,11 @@ import ScalapbJsonCommon.GenericCompanion
  */
 case class TypeRegistry(
   companions: Map[String, GenericCompanion] = Map.empty,
-  private val filesSeen: Set[String] = Set.empty) {
+  private val filesSeen: Set[String] = Set.empty
+) {
   def addMessage[T <: GeneratedMessage with Message[T]](
-    implicit cmp: GeneratedMessageCompanion[T]): TypeRegistry = {
+    implicit cmp: GeneratedMessageCompanion[T]
+  ): TypeRegistry = {
     addMessageByCompanion(cmp)
   }
 
@@ -24,18 +26,21 @@ case class TypeRegistry(
       val withDeps: TypeRegistry =
         file.dependencies.foldLeft(withFileSeen)((r, f) => r.addFile(f))
 
-      file.messagesCompanions.foldLeft(withDeps)((r, mc) =>
-        r.addMessageByCompanion(mc.asInstanceOf[GenericCompanion]))
+      file.messagesCompanions.foldLeft(withDeps)(
+        (r, mc) => r.addMessageByCompanion(mc.asInstanceOf[GenericCompanion])
+      )
     }
   }
 
   def addMessageByCompanion(cmp: GenericCompanion): TypeRegistry = {
     // TODO: need to add contained file to follow JsonFormat
     val withNestedMessages =
-      cmp.nestedMessagesCompanions.foldLeft(this)((r, mc) =>
-        r.addMessageByCompanion(mc.asInstanceOf[GenericCompanion]))
+      cmp.nestedMessagesCompanions.foldLeft(this)(
+        (r, mc) => r.addMessageByCompanion(mc.asInstanceOf[GenericCompanion])
+      )
     copy(
-      companions = withNestedMessages.companions + ((TypeRegistry.TypePrefix + cmp.scalaDescriptor.fullName) -> cmp))
+      companions = withNestedMessages.companions + ((TypeRegistry.TypePrefix + cmp.scalaDescriptor.fullName) -> cmp)
+    )
   }
 
   def findType(typeName: String): Option[GenericCompanion] = companions.get(typeName)

@@ -26,10 +26,12 @@ object TimestampSpec extends TestSuite {
 
       assert(
         Timestamps.writeTimestamp(Timestamps.parseTimestamp("1970-01-01T00:00:00.010+08:35")) ==
-          "1969-12-31T15:25:00.010Z")
+          "1969-12-31T15:25:00.010Z"
+      )
       assert(
         Timestamps.writeTimestamp(Timestamps.parseTimestamp("1970-01-01T00:00:00.010-08:12")) ==
-          "1970-01-01T08:12:00.010Z")
+          "1970-01-01T08:12:00.010Z"
+      )
     }
   }
 }
