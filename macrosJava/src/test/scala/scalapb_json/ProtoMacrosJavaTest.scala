@@ -20,7 +20,10 @@ class ProtoMacrosJavaTest extends FunSpec with Matchers {
           _.foobar := 42
         )
       )
-      """ jsontest.test.MyTest.fromJson("{") """ shouldNot compile
+      """ jsontest.test.MyTest.fromJsonConstant("{") """ shouldNot compile
+      assert(MyTest.fromJsonTry("{").isFailure)
+      assert(MyTest.fromJsonOpt("{").isEmpty)
+      assert(MyTest.fromJsonEither("{").isLeft)
     }
   }
 }
