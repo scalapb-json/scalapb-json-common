@@ -15,11 +15,12 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
-val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("."))
+val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
     commonSettings,
+    name := UpdateReadme.scalapbJsonCommonName,
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map { f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
       val buildInfoDir = "sbt-buildinfo"
@@ -84,6 +85,24 @@ val scalapbJsonCommon = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
+val macros = project.settings(
+  commonSettings,
+  name := UpdateReadme.scalapbJsonMacrosName,
+  libraryDependencies ++= Seq(
+    scalaOrganization.value % "scala-reflect" % scalaVersion.value,
+  ),
+)
+
+val macrosJava = project.settings(
+  commonSettings,
+  name := UpdateReadme.scalapbJsonMacrosJavaName,
+  libraryDependencies ++= Seq(
+    "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
+  )
+).dependsOn(
+  macros
+)
+
 commonSettings
 
 val noPublish = Seq(
@@ -111,10 +130,9 @@ lazy val commonSettings = Def.settings(
   description := "Json/Protobuf convertors for ScalaPB",
   licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
   organization := "io.github.scalapb-json",
-  name := UpdateReadme.scalapbJsonCommonName,
   Project.inConfig(Test)(sbtprotoc.ProtocPlugin.protobufConfigSettings),
   PB.targets in Compile := Nil,
-  PB.protoSources in Test := Seq(file("shared/src/test/protobuf")),
+  PB.protoSources in Test := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbVersion % "protobuf,test",
@@ -172,7 +190,7 @@ lazy val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; scalapbJsonCommonNative/publishSigned"),
+    releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; coreNative/publishSigned"),
     setNextVersion,
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"),
@@ -181,9 +199,9 @@ lazy val commonSettings = Def.settings(
   )
 )
 
-val scalapbJsonCommonJVM = scalapbJsonCommon.jvm
-val scalapbJsonCommonJS = scalapbJsonCommon.js
-val scalapbJsonCommonNative = scalapbJsonCommon.native
+val coreJVM = core.jvm
+val coreJS = core.js
+val coreNative = core.native
 
 val root = project
   .in(file("."))
@@ -196,7 +214,9 @@ val root = project
     PgpKeys.publishLocalSigned := {}
   )
   .aggregate(
-    scalapbJsonCommonJVM,
-    scalapbJsonCommonJS
+    coreJVM,
+    coreJS,
+    macros,
+    macrosJava
     // exclude Native on purpose
   )

@@ -5,12 +5,14 @@ import sbtrelease.Git
 object UpdateReadme {
 
   val scalapbJsonCommonName = "scalapb-json-common"
+  val scalapbJsonMacrosName = "scalapb-json-macros"
+  val scalapbJsonMacrosJavaName = "scalapb-json-macros-java"
 
   val updateReadmeTask = { state: State =>
     val extracted = Project.extract(state)
     val v = extracted get version
     val org = extracted get organization
-    val modules = scalapbJsonCommonName :: Nil
+    val modules = scalapbJsonCommonName :: scalapbJsonMacrosName :: scalapbJsonMacrosJavaName :: Nil
     val readme = "README.md"
     val readmeFile = file(readme)
     val newReadme = Predef
