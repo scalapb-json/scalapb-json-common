@@ -115,12 +115,22 @@ lazy val macrosJava = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
-    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-circe" % "0.4.0",
     noPublish,
   )
   .configure(_ dependsOn (macros, macrosJava))
+  .jvmSettings(
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-circe" % "0.4.0",
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-argonaut" % "0.3.0",
+    libraryDependencies += "io.github.scalapb-json" %%% "scalapb-playjson" % "0.8.2",
+  )
   .platformsSettings(JVMPlatform, JSPlatform)(
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+  )
+  .nativeSettings(
+    nativeLinkStubs := true,
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % "test",
+    crossScalaVersions := Scala211 :: Nil,
+    scalaVersion := Scala211,
   )
 
 lazy val testsJVM = tests.jvm.dependsOn(coreJVM % "test->test")

@@ -1,4 +1,4 @@
-package scalapb_circe
+package scalapb_argonaut
 
 import scalapb.{GeneratedMessage, GeneratedMessageCompanion, Message}
 
@@ -6,54 +6,55 @@ import scala.reflect.macros.blackbox
 import language.experimental.macros
 import scala.util.Try
 
-object ProtoMacrosCirce {
+object ProtoMacrosArgonaut {
 
   implicit class ProtoContext(private val c: StringContext) extends AnyVal {
     def struct(): com.google.protobuf.struct.Struct =
-      macro ProtoMacrosCirce.protoStructInterpolation
+      macro ProtoMacrosArgonaut.protoStructInterpolation
     def value(): com.google.protobuf.struct.Value =
-      macro ProtoMacrosCirce.protoValueInterpolation
+      macro ProtoMacrosArgonaut.protoValueInterpolation
   }
 
   implicit class FromJson[A <: GeneratedMessage with Message[A]](
     val companion: GeneratedMessageCompanion[A]
   ) extends AnyVal {
-    def fromJsonConstant(json: String): A = macro ProtoMacrosCirce.fromJsonConstantImpl0[A]
+    def fromJsonConstant(json: String): A = macro ProtoMacrosArgonaut.fromJsonConstantImpl0[A]
 
-    def fromJson(json: String): A = macro ProtoMacrosCirce.fromJsonImpl[A]
+    def fromJson(json: String): A = macro ProtoMacrosArgonaut.fromJsonImpl[A]
 
-    def fromJsonDebug(json: String): A = macro ProtoMacrosCirce.fromJsonDebugImpl
+    def fromJsonDebug(json: String): A = macro ProtoMacrosArgonaut.fromJsonDebugImpl
 
     def fromJsonOpt(json: String): Option[A] =
-      macro ProtoMacrosCirce.fromJsonOptImpl[A]
+      macro ProtoMacrosArgonaut.fromJsonOptImpl[A]
 
     def fromJsonEither(json: String): Either[Throwable, A] =
-      macro ProtoMacrosCirce.fromJsonEitherImpl[A]
+      macro ProtoMacrosArgonaut.fromJsonEitherImpl[A]
 
     def fromJsonTry(json: String): Try[A] =
-      macro ProtoMacrosCirce.fromJsonTryImpl[A]
+      macro ProtoMacrosArgonaut.fromJsonTryImpl[A]
   }
 }
 
-class ProtoMacrosCirce(override val c: blackbox.Context) extends scalapb_json.ProtoMacrosCommon(c) {
+class ProtoMacrosArgonaut(override val c: blackbox.Context)
+  extends scalapb_json.ProtoMacrosCommon(c) {
 
   import c.universe._
 
   override def fromJsonImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
     val A = weakTypeTag[A]
-    q"_root_.scalapb_circe.JsonFormat.fromJsonString[$A]($json)"
+    q"_root_.scalapb_argonaut.JsonFormat.fromJsonString[$A]($json)"
   }
 
   override def fromJsonConstantImpl[A <: GeneratedMessage with Message[A]: c.WeakTypeTag: GeneratedMessageCompanion](
     string: String
   ): c.Tree = {
     val A = weakTypeTag[A]
-    scalapb_circe.JsonFormat.fromJsonString[A](string)
-    q"_root_.scalapb_circe.JsonFormat.fromJsonString[$A]($string)"
+    scalapb_argonaut.JsonFormat.fromJsonString[A](string)
+    q"_root_.scalapb_argonaut.JsonFormat.fromJsonString[$A]($string)"
   }
 
-  private[this] def parseJson(json: String): io.circe.Json = {
-    io.circe.parser.parse(json).fold(throw _, identity)
+  private[this] def parseJson(json: String): argonaut.Json = {
+    argonaut.JsonParser.parse(json).left.map(sys.error(_)).merge
   }
 
   override protected[this] def protoString2Struct(string: String): c.Tree = {
