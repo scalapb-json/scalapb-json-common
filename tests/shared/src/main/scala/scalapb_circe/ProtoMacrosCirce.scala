@@ -1,6 +1,5 @@
 package scalapb_circe
 
-import com.google.protobuf.InvalidProtocolBufferException
 import scalapb.{GeneratedMessage, GeneratedMessageCompanion, Message}
 
 import scala.reflect.macros.blackbox
@@ -26,13 +25,13 @@ object ProtoMacrosCirce {
     def fromJsonDebug(json: String): A = macro ProtoMacrosCirce.fromJsonDebugImpl
 
     def fromJsonOpt(json: String): Option[A] =
-      macro ProtoMacrosCirce.fromJsonOptImpl
+      macro ProtoMacrosCirce.fromJsonOptImpl[A]
 
-    def fromJsonEither(json: String): Either[InvalidProtocolBufferException, A] =
-      macro ProtoMacrosCirce.fromJsonEitherImpl
+    def fromJsonEither(json: String): Either[Throwable, A] =
+      macro ProtoMacrosCirce.fromJsonEitherImpl[A]
 
     def fromJsonTry(json: String): Try[A] =
-      macro ProtoMacrosCirce.fromJsonTryImpl
+      macro ProtoMacrosCirce.fromJsonTryImpl[A]
   }
 }
 

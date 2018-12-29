@@ -1,6 +1,5 @@
 package scalapb_json
 
-import com.google.protobuf.InvalidProtocolBufferException
 import com.google.protobuf.util.JsonFormat
 import scalapb.{GeneratedMessage, GeneratedMessageCompanion, Message}
 
@@ -27,13 +26,13 @@ object ProtoMacrosJava {
     def fromJsonDebug(json: String): A = macro ProtoMacrosJava.fromJsonDebugImpl
 
     def fromJsonOpt(json: String): Option[A] =
-      macro ProtoMacrosJava.fromJsonOptImpl
+      macro ProtoMacrosJava.fromJsonOptImpl[A]
 
-    def fromJsonEither(json: String): Either[InvalidProtocolBufferException, A] =
-      macro ProtoMacrosJava.fromJsonEitherImpl
+    def fromJsonEither(json: String): Either[Throwable, A] =
+      macro ProtoMacrosJava.fromJsonEitherImpl[A]
 
     def fromJsonTry(json: String): Try[A] =
-      macro ProtoMacrosJava.fromJsonTryImpl
+      macro ProtoMacrosJava.fromJsonTryImpl[A]
   }
 }
 

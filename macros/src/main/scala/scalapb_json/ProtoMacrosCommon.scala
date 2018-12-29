@@ -10,31 +10,31 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
 
   import c.universe._
 
-  def fromJsonOptImpl(json: c.Tree): c.Tree = {
+  def fromJsonOptImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
     q"""try{
-      _root_.scala.Some(${fromJsonImpl(json)})
+      _root_.scala.Some(${fromJsonImpl[A](json)})
     } catch {
-      case _: _root_.com.google.protobuf.InvalidProtocolBufferException =>
+      case _root_.scala.util.control.NonFatal(_) =>
         _root_.scala.None
     }"""
   }
 
-  def fromJsonEitherImpl(json: c.Tree): c.Tree = {
+  def fromJsonEitherImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
     val error = TermName(c.freshName)
     q"""try{
-      _root_.scala.Right(${fromJsonImpl(json)})
+      _root_.scala.Right(${fromJsonImpl[A](json)})
     } catch {
-      case $error : _root_.com.google.protobuf.InvalidProtocolBufferException =>
+      case _root_.scala.util.control.NonFatal($error) =>
         _root_.scala.Left($error)
     }"""
   }
 
-  def fromJsonTryImpl(json: c.Tree): c.Tree = {
+  def fromJsonTryImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
     val error = TermName(c.freshName)
     q"""try{
-      _root_.scala.util.Success(${fromJsonImpl(json)})
+      _root_.scala.util.Success(${fromJsonImpl[A](json)})
     } catch {
-      case $error: _root_.com.google.protobuf.InvalidProtocolBufferException =>
+      case _root_.scala.util.control.NonFatal($error) =>
         _root_.scala.util.Failure($error)
     }"""
   }
