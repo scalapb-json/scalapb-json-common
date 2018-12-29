@@ -118,13 +118,12 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     libraryDependencies += "io.github.scalapb-json" %%% "scalapb-circe" % "0.4.0",
     noPublish,
   )
-  .dependsOn(core % "test->test")
   .configure(_ dependsOn (macros, macrosJava))
   .platformsSettings(JVMPlatform, JSPlatform)(
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
 
-lazy val testsJVM = tests.jvm
+lazy val testsJVM = tests.jvm.dependsOn(coreJVM % "test->test")
 lazy val testsJS = tests.js
 lazy val testsNative = tests.native
 
