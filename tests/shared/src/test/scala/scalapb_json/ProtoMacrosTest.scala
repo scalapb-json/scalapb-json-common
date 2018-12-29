@@ -7,7 +7,7 @@ import scalapb_json.ProtoMacrosJava._
 import com.google.protobuf.struct._
 
 class ProtoMacrosTest extends FunSpec with Matchers {
-  describe("ProtoMacro") {
+  describe("ProtoMacros") {
     it("struct") {
       assert(struct"{}" == Struct.defaultInstance)
 
