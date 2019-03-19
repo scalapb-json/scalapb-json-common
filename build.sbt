@@ -4,7 +4,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.8"
-val scalatestVersion = "3.0.6"
+val scalatestVersion = "3.0.7"
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
