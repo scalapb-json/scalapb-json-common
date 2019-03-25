@@ -88,7 +88,7 @@ object ScalapbJsonCommon {
       case e: JsonFormatException => throw e
       case _: Exception => // Fall through.
     }
-    parseBigDecimal(value).toBigIntExact().map { intVal =>
+    parseBigDecimal(value).toBigIntExact.map { intVal =>
       if (intVal < 0 || intVal > 0XFFFFFFFFL)
         throw new JsonFormatException(s"Out of range uint32 value: $value")
       PLong(intVal.intValue())
@@ -100,7 +100,7 @@ object ScalapbJsonCommon {
   val MAX_UINT64 = BigInt("FFFFFFFFFFFFFFFF", 16)
 
   def parseUint64(value: String): PValue = {
-    parseBigDecimal(value).toBigIntExact().map { intVal =>
+    parseBigDecimal(value).toBigIntExact.map { intVal =>
       if (intVal < 0 || intVal > MAX_UINT64) {
         throw new JsonFormatException(s"Out of range uint64 value: $value")
       }
