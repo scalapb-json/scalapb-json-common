@@ -4,7 +4,10 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.8"
+val Scala213 = "2.13.0-M5"
 val scalatestVersion = "3.0.7"
+
+val scalapbV = settingKey[String]("")
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -16,6 +19,13 @@ val tagOrHash = Def.setting {
 }
 
 val unusedWarnings = Seq("-Ywarn-unused")
+
+val commonNativeSettings = Def.settings(
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % "test",
+  crossScalaVersions := Scala211 :: Nil,
+  scalapbV := "0.9.0-RC1", // https://github.com/scalapb/ScalaPB/blob/7d7a48fb01b/build.sbt#L92-L94
+  nativeLinkStubs := true
+)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("core"))
@@ -40,7 +50,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     buildInfoPackage := "scalapb_json",
     buildInfoObject := "ScalapbJsonCommonBuildInfo",
     buildInfoKeys := Seq[BuildInfoKey](
-      "scalapbVersion" -> scalapbVersion,
+      "scalapbVersion" -> scalapbV,
       scalaVersion,
       version
     )
@@ -55,8 +65,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
   .nativeSettings(
-    crossScalaVersions := Scala211 :: Nil,
-    nativeLinkStubs := true
+    commonNativeSettings
   )
   .jsSettings(
     scalacOptions += {
@@ -124,10 +133,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
   .nativeSettings(
-    nativeLinkStubs := true,
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % "test",
-    crossScalaVersions := Scala211 :: Nil,
-    scalaVersion := Scala211,
+    commonNativeSettings
   )
 
 lazy val testsJVM = tests.jvm
@@ -147,9 +153,10 @@ lazy val noPublish = Seq(
 noPublish
 
 lazy val commonSettings = Def.settings(
+  scalapbV := scalapbVersion,
   unmanagedResources in Compile += (baseDirectory in LocalRootProject).value / "LICENSE.txt",
   scalaVersion := Scala211,
-  crossScalaVersions := Seq(Scala212, Scala211),
+  crossScalaVersions := Seq(Scala212, Scala211, Scala213),
   scalacOptions ++= PartialFunction
     .condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
       case Some((2, v)) if v >= 11 => unusedWarnings
@@ -164,8 +171,8 @@ lazy val commonSettings = Def.settings(
   PB.targets in Compile := Nil,
   PB.protoSources in Test := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
-    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbVersion,
-    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbVersion % "protobuf,test",
+    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
     "com.lihaoyi" %%% "utest" % "0.6.6" % "test"
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
