@@ -4,8 +4,8 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.8"
-val Scala213 = "2.13.0-M5"
-val scalatestVersion = "3.0.7"
+val Scala213 = "2.13.0-RC1"
+val scalatestVersion = "3.0.8-RC2"
 
 val scalapbV = settingKey[String]("")
 
@@ -25,6 +25,37 @@ val commonNativeSettings = Def.settings(
   crossScalaVersions := Scala211 :: Nil,
   scalapbV := "0.9.0-RC1", // https://github.com/scalapb/ScalaPB/blob/7d7a48fb01b/build.sbt#L92-L94
   nativeLinkStubs := true
+)
+
+lazy val workaroundScalaJavaTime = Def.settings(
+  sources in Compile := {
+    val src = (sources in Compile).value
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v <= 12 =>
+        src
+      case _ =>
+        src.filterNot(
+          s => Set("Durations.scala", "Timestamps.scala", "WellKnownTypes.scala") contains s.getName
+        )
+    }
+  },
+  sources in Test := {
+    val src = (sources in Test).value
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v <= 12 =>
+        src
+      case _ =>
+        src.filterNot(s => Set("DurationSpec.scala", "TimestampSpec.scala") contains s.getName)
+    }
+  },
+  libraryDependencies ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v <= 12 =>
+        Seq("io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC1")
+      case _ =>
+        Nil
+    }
+  }
 )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -73,9 +104,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       val g = "https://raw.githubusercontent.com/scalapb-json/scalapb-json-common/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
-    libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC1"
-    )
+    // TODO https://github.com/cquiroz/scala-java-time/issues/94
+    workaroundScalaJavaTime
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
     // TODO enable in scala-native https://github.com/scalaprops/sbt-scalaprops/issues/4
@@ -173,7 +203,7 @@ lazy val commonSettings = Def.settings(
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % "0.6.6" % "test"
+    "com.lihaoyi" %%% "utest" % "0.6.7" % "test"
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   pomExtra in Global := {
