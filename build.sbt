@@ -8,6 +8,18 @@ val Scala213 = "2.13.0-RC1"
 val scalatestVersion = "3.0.8-RC3"
 
 val scalapbV = settingKey[String]("")
+val utestVersion = Def.setting {
+  if (scalaVersion.value == "2.13.0-RC1") {
+    "0.6.7"
+  } else {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v <= 11 =>
+        "0.6.8"
+      case _ =>
+        "0.6.9"
+    }
+  }
+}
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -203,7 +215,7 @@ lazy val commonSettings = Def.settings(
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % "0.6.7" % "test"
+    "com.lihaoyi" %%% "utest" % utestVersion.value % "test"
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   pomExtra in Global := {
