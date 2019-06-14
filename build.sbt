@@ -4,20 +4,16 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.8"
-val Scala213 = "2.13.0-RC1"
-val scalatestVersion = "3.0.8-RC3"
+val Scala213 = "2.13.0"
+val scalatestVersion = "3.0.8"
 
 val scalapbV = settingKey[String]("")
 val utestVersion = Def.setting {
-  if (scalaVersion.value == "2.13.0-RC1") {
-    "0.6.7"
-  } else {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, v)) if v <= 11 =>
-        "0.6.8"
-      case _ =>
-        "0.6.9"
-    }
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, v)) if v <= 11 =>
+      "0.6.8"
+    case _ =>
+      "0.6.9"
   }
 }
 
@@ -37,37 +33,6 @@ val commonNativeSettings = Def.settings(
   crossScalaVersions := Scala211 :: Nil,
   scalapbV := "0.9.0-RC1", // https://github.com/scalapb/ScalaPB/blob/7d7a48fb01b/build.sbt#L92-L94
   nativeLinkStubs := true
-)
-
-lazy val workaroundScalaJavaTime = Def.settings(
-  sources in Compile := {
-    val src = (sources in Compile).value
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, v)) if v <= 12 =>
-        src
-      case _ =>
-        src.filterNot(
-          s => Set("Durations.scala", "Timestamps.scala", "WellKnownTypes.scala") contains s.getName
-        )
-    }
-  },
-  sources in Test := {
-    val src = (sources in Test).value
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, v)) if v <= 12 =>
-        src
-      case _ =>
-        src.filterNot(s => Set("DurationSpec.scala", "TimestampSpec.scala") contains s.getName)
-    }
-  },
-  libraryDependencies ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, v)) if v <= 12 =>
-        Seq("io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC1")
-      case _ =>
-        Nil
-    }
-  }
 )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -116,8 +81,9 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       val g = "https://raw.githubusercontent.com/scalapb-json/scalapb-json-common/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
-    // TODO https://github.com/cquiroz/scala-java-time/issues/94
-    workaroundScalaJavaTime
+    libraryDependencies ++= Seq(
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC3",
+    ),
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
     // TODO enable in scala-native https://github.com/scalaprops/sbt-scalaprops/issues/4
@@ -211,6 +177,10 @@ lazy val commonSettings = Def.settings(
   organization := "io.github.scalapb-json",
   Project.inConfig(Test)(sbtprotoc.ProtocPlugin.protobufConfigSettings),
   PB.targets in Compile := Nil,
+  // Can't use -v380
+  // https://github.com/scalapb/ScalaPB/commit/ff99b075625fe684ce2eef7686d587fdbbf19b62
+  // https://github.com/scalapb/ScalaPB/commit/d3cc69515ea90f1af7eaf2732d22facb6c9e95e3
+  PB.protocVersion := "-v371",
   PB.protoSources in Test := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
