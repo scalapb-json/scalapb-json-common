@@ -110,6 +110,51 @@ object ScalapbJsonCommon {
     }
   }
 
+  private[this] val PDoubleNaN = PDouble(Double.NaN)
+  private[this] val PDoublePosInf = PDouble(Double.PositiveInfinity)
+  private[this] val PDoubleNegInf = PDouble(Double.NegativeInfinity)
+
+  private[this] val PFloatNaN = PFloat(Float.NaN)
+  private[this] val PFloatPosInf = PFloat(Float.PositiveInfinity)
+  private[this] val PFloatNegInf = PFloat(Float.NegativeInfinity)
+
+  def parseDouble(value: String): PDouble = value match {
+    case "NaN" => PDoubleNaN
+    case "Infinity" => PDoublePosInf
+    case "-Infinity" => PDoubleNegInf
+    case v =>
+      try {
+        val bd = new java.math.BigDecimal(v)
+        if (bd.compareTo(MAX_DOUBLE) > 0 || bd.compareTo(MIN_DOUBLE) < 0) {
+          throw new JsonFormatException("Out of range double value: " + v)
+        }
+        PDouble(bd.doubleValue)
+      } catch {
+        case e: JsonFormatException => throw e
+        case e: Exception =>
+          throw new JsonFormatException("Not a double value: " + v, e)
+      }
+  }
+
+  def parseFloat(value: String): PFloat = value match {
+    case "NaN" => PFloatNaN
+    case "Infinity" => PFloatPosInf
+    case "-Infinity" => PFloatNegInf
+    case v =>
+      try {
+        val value = java.lang.Double.parseDouble(v)
+        if ((value > Float.MaxValue * (1.0 + EPSILON)) ||
+          (value < -Float.MaxValue * (1.0 + EPSILON))) {
+          throw new JsonFormatException("Out of range float value: " + value)
+        }
+        PFloat(value.toFloat)
+      } catch {
+        case e: JsonFormatException => throw e
+        case e: Exception =>
+          throw new JsonFormatException("Not a float value: " + v, e)
+      }
+  }
+
   def jsonName(fd: FieldDescriptor): String = {
     // protoc<3 doesn't know about json_name, so we fill it in if it's not populated.
     fd.asProto.jsonName.getOrElse(NameUtils.snakeCaseToCamelCase(fd.asProto.getName))
@@ -141,4 +186,13 @@ object ScalapbJsonCommon {
       .toList
     FieldMask(result)
   }
+
+  // From protobuf-java's JsonFormat.java:
+  val EPSILON: Double = 1e-6
+
+  val MORE_THAN_ONE = new java.math.BigDecimal(String.valueOf(1.toDouble + EPSILON))
+
+  val MAX_DOUBLE = new java.math.BigDecimal(String.valueOf(Double.MaxValue)).multiply(MORE_THAN_ONE)
+
+  val MIN_DOUBLE = new java.math.BigDecimal(String.valueOf(Double.MinValue)).multiply(MORE_THAN_ONE)
 }
