@@ -204,12 +204,7 @@ lazy val commonSettings = Def.settings(
         </developer>
       </developers>
   },
-  publishTo := Some(
-    if (isSnapshot.value)
-      Opts.resolver.sonatypeSnapshots
-    else
-      Opts.resolver.sonatypeStaging
-  ),
+  publishTo := sonatypePublishToBundle.value,
   scalacOptions in (Compile, doc) ++= {
     val t = tagOrHash.value
     Seq(
@@ -242,7 +237,7 @@ lazy val commonSettings = Def.settings(
     releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; coreNative/publishSigned"),
     setNextVersion,
     commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
+    releaseStepCommand("sonatypeBundleRelease"),
     UpdateReadme.updateReadmeProcess,
     pushChanges
   )
