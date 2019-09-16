@@ -235,9 +235,9 @@ lazy val commonSettings = Def.settings(
       enableCrossBuild = true
     ),
     releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; coreNative/publishSigned"),
+    releaseStepCommand("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
-    releaseStepCommand("sonatypeBundleRelease"),
     UpdateReadme.updateReadmeProcess,
     pushChanges
   )
