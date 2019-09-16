@@ -3,7 +3,7 @@ import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.8"
+val Scala212 = "2.12.10"
 val Scala213 = "2.13.0"
 val scalatestVersion = "3.0.8"
 
