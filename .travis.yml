@@ -19,9 +19,3 @@ matrix:
   include:
   - scala: 2.12.10
     jdk: openjdk11
-  - sudo: required
-    env: SCALA_NATIVE
-    before_install:
-    - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -
-    script:
-    - sbt "scalafmtCheck" "test:scalafmtCheck" "scalafmtSbtCheck" coreNative/test testsNative/test

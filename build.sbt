@@ -28,14 +28,7 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
-val commonNativeSettings = Def.settings(
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % "test",
-  crossScalaVersions := Scala211 :: Nil,
-  scalapbV := "0.9.0-RC1", // https://github.com/scalapb/ScalaPB/blob/7d7a48fb01b/build.sbt#L92-L94
-  nativeLinkStubs := true
-)
-
-lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform)
   .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
@@ -72,9 +65,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion % "test"
     )
   )
-  .nativeSettings(
-    commonNativeSettings
-  )
   .jsSettings(
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
@@ -85,22 +75,12 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC3",
     ),
   )
-  .platformsSettings(JVMPlatform, JSPlatform)(
-    // TODO enable in scala-native https://github.com/scalaprops/sbt-scalaprops/issues/4
+  .settings(
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.6.2" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
-    Seq((Compile, "main"), (Test, "test")).map {
-      case (x, y) =>
-        unmanagedSourceDirectories in x += {
-          baseDirectory.value.getParentFile / s"jvm_js/src/${y}/scala/"
-        }
-    }
   )
-  .platformsSettings(JSPlatform, NativePlatform)(
-    unmanagedSourceDirectories in Compile += {
-      baseDirectory.value.getParentFile / "js_native/src/main/scala/"
-    },
+  .platformsSettings(JSPlatform)(
     PB.targets in Test := Seq(
       scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
     )
@@ -131,7 +111,7 @@ lazy val macrosJava = project
     coreJVM % "test->test",
   )
 
-lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     commonSettings,
     noPublish,
@@ -140,13 +120,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .platformsSettings(JVMPlatform, JSPlatform)(
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
-  .nativeSettings(
-    commonNativeSettings
-  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
-lazy val testsNative = tests.native
 
 commonSettings
 
@@ -234,7 +210,6 @@ lazy val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining(s"; ++ ${Scala211}! ; coreNative/publishSigned"),
     releaseStepCommand("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
@@ -245,23 +220,10 @@ lazy val commonSettings = Def.settings(
 
 val coreJVM = core.jvm
 val coreJS = core.js
-val coreNative = core.native
 
-val root = project
-  .in(file("."))
-  .settings(
-    commonSettings,
-    publishArtifact := false,
-    publish := {},
-    publishLocal := {},
-    PgpKeys.publishSigned := {},
-    PgpKeys.publishLocalSigned := {}
-  )
-  .aggregate(
-    coreJVM,
-    coreJS, // exclude Native on purpose
-    macros,
-    macrosJava,
-    testsJVM,
-    testsJS,
-  )
+commonSettings
+publishArtifact := false
+publish := {}
+publishLocal := {}
+PgpKeys.publishSigned := {}
+PgpKeys.publishLocalSigned := {}
