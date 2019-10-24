@@ -8,23 +8,23 @@ Include in your `build.sbt` file
 ### core
 
 ```scala
-libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-common" % "0.5.3"
+libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-common" % "0.6.0-M1"
 ```
 
 for scala-js, scala-native
 
 ```scala
-libraryDependencies += "io.github.scalapb-json" %%% "scalapb-json-common" % "0.5.3"
+libraryDependencies += "io.github.scalapb-json" %%% "scalapb-json-common" % "0.6.0-M1"
 ```
 
 ### macros
 
 ```scala
-libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros" % "0.5.3"
+libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros" % "0.6.0-M1"
 ```
 
 ```scala
-libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros-java" % "0.5.3"
+libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros-java" % "0.6.0-M1"
 ```
 
 ### for Scala 2.10.x
