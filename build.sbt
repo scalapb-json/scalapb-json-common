@@ -88,7 +88,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .platformsSettings(JVMPlatform, JSPlatform)(
     // TODO enable in scala-native https://github.com/scalaprops/sbt-scalaprops/issues/4
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.6.1" % "test",
+    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.6.2" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
     Seq((Compile, "main"), (Test, "test")).map {
       case (x, y) =>
