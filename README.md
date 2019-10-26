@@ -30,7 +30,3 @@ libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros-java" % 
 ### for Scala 2.10.x
 
 see https://github.com/scalapb-json/scalapb-json-common/tree/0.3.x
-
-### for ScalaPB 0.7.x
-
-see https://github.com/scalapb-json/scalapb-json-common/tree/0.2.x
