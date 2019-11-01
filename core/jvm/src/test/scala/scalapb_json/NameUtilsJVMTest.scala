@@ -4,7 +4,6 @@ import scalaprops._
 import com.google.common.base.CaseFormat
 
 object NameUtilsJVMTest extends Scalaprops {
-
   override def param = super.param.copy(minSuccessful = 10000)
 
   // https://docs.oracle.com/javase/8/docs/api/java/lang/Character.html#isLowerCase-char-
@@ -36,5 +35,4 @@ object NameUtilsJVMTest extends Scalaprops {
     utest.assert(x == y)
     true
   }
-
 }

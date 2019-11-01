@@ -85,6 +85,5 @@ class ProtoMacrosTest extends FunSpec with Matchers {
 
       """ _root_.com.google.protobuf.struct.Struct.fromTextFormat("{") """ shouldNot compile
     }
-
   }
 }

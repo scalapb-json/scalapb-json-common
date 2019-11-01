@@ -7,7 +7,6 @@ import scalapb._
 import scalapb.descriptors._
 
 object ScalapbJsonCommon {
-
   def unsignedInt(n: Int): Long = n & 0X00000000FFFFFFFFL
 
   type GenericCompanion = GeneratedMessageCompanion[T] forSome {

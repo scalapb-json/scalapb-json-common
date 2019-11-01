@@ -31,11 +31,9 @@ object ProtoMacros {
         )
     }
   }
-
 }
 
 final class ProtoMacros(val c: blackbox.Context) {
-
   import c.universe._
 
   def fromTextFormatDebugImpl(textFormat: c.Tree): c.Tree = {

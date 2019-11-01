@@ -87,5 +87,4 @@ class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommo
     val x = com.google.protobuf.struct.Struct.fromJavaProto(builder.build())
     q"$x"
   }
-
 }

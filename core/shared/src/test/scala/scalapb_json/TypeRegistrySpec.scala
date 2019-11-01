@@ -5,7 +5,6 @@ import jsontest.test3.{MyTest3, Test3Proto, Wrapper}
 import utest._
 
 object TypeRegistrySpec extends TestSuite {
-
   val tests = Tests {
     "addFile should add all messages in the file" - {
       val reg = TypeRegistry().addFile(Test3Proto)
@@ -22,5 +21,4 @@ object TypeRegistrySpec extends TestSuite {
       assert(reg.findType("type.googleapis.com/jsontest.Wrapper") == None)
     }
   }
-
 }

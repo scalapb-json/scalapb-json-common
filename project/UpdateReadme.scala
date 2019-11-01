@@ -3,7 +3,6 @@ import sbtrelease.ReleasePlugin.autoImport.ReleaseStep
 import sbtrelease.Git
 
 object UpdateReadme {
-
   val scalapbJsonCommonName = "scalapb-json-common"
   val scalapbJsonMacrosName = "scalapb-json-macros"
   val scalapbJsonMacrosJavaName = "scalapb-json-macros-java"

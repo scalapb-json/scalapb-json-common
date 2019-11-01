@@ -4,7 +4,6 @@ import com.google.protobuf.timestamp.Timestamp
 import utest._
 
 object TimestampSpec extends TestSuite {
-
   val tests = Tests {
     "Timestamp parser should work" - {
       val start = Timestamps.parseTimestamp("0001-01-01T00:00:00Z")

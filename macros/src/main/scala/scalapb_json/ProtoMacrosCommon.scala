@@ -6,7 +6,6 @@ import scalapb.GeneratedMessageCompanion
 import scala.reflect.macros.blackbox
 
 abstract class ProtoMacrosCommon(val c: blackbox.Context) {
-
   import c.universe._
 
   def fromJsonOptImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
@@ -81,7 +80,6 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
 
   implicit val NullValueLiftable: Liftable[com.google.protobuf.struct.NullValue] =
     new Liftable[com.google.protobuf.struct.NullValue] {
-
       import com.google.protobuf.struct.NullValue
 
       override def apply(value: NullValue) = value match {
@@ -101,7 +99,6 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
     }
 
   implicit val ValueLiftable: Liftable[Value] = new Liftable[Value] {
-
     import com.google.protobuf.struct.Value.Kind._
 
     override def apply(v: Value) = {

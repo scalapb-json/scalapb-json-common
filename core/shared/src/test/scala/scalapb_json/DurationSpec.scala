@@ -5,7 +5,6 @@ import jsontest.test.WellKnownTest
 import utest._
 
 object DurationSpec extends TestSuite {
-
   val durationProto = WellKnownTest(duration = Some(Duration(146, 3455)))
 
   val tests = Tests {
@@ -30,5 +29,4 @@ object DurationSpec extends TestSuite {
       assert(Durations.parseDuration("-146.000000345s") == Duration(-146, -345))
     }
   }
-
 }
