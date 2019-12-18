@@ -1,12 +1,12 @@
 package scalapb_json
 
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import scalapb_json.ProtoMacros._
 import scalapb_json.ProtoMacrosJava._
 import com.google.protobuf.struct._
 
-class ProtoMacrosTest extends FunSpec with Matchers {
+class ProtoMacrosTest extends AnyFunSpec with Matchers {
   describe("ProtoMacros") {
     it("struct") {
       assert(struct"{}" == Struct.defaultInstance)

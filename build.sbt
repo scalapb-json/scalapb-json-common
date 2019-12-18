@@ -5,7 +5,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.10"
 val Scala213 = "2.13.1"
-val scalatestVersion = "3.0.8"
+val scalatestVersion = "3.1.0"
 
 val scalapbV = settingKey[String]("")
 val utestVersion = Def.setting {

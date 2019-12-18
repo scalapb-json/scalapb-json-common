@@ -1,12 +1,12 @@
 package scalapb_json
 
 import jsontest.test.MyTest
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import scalapb_json.ProtoMacrosJava._
 import scala.util.Success
 
-class ProtoMacrosJavaTest extends FunSpec with Matchers {
+class ProtoMacrosJavaTest extends AnyFunSpec with Matchers {
   describe("ProtoMacrosJava") {
     it("fromJson") {
       assert(MyTest.fromJsonConstant("{}") === MyTest())
