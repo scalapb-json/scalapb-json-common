@@ -12,7 +12,7 @@ case class TypeRegistry(
   companions: Map[String, GenericCompanion] = Map.empty,
   private val filesSeen: Set[String] = Set.empty
 ) {
-  def addMessage[T <: GeneratedMessage with Message[T]](
+  def addMessage[T <: GeneratedMessage](
     implicit cmp: GeneratedMessageCompanion[T]
   ): TypeRegistry = {
     addMessageByCompanion(cmp)

@@ -1,12 +1,12 @@
 package scalapb_json
 
-import scalapb.{GeneratedMessage, GeneratedMessageCompanion, Message}
+import scalapb.{GeneratedMessage, GeneratedMessageCompanion}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object ProtoMacros {
-  implicit class ScalaPBMessageOps[A <: GeneratedMessage with Message[A]](
+  implicit class ScalaPBMessageOps[A <: GeneratedMessage](
     private val companion: GeneratedMessageCompanion[A]
   ) extends AnyVal {
     def fromTextFormat(textFormat: String): A =

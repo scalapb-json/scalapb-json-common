@@ -1,7 +1,7 @@
 package scalapb_json
 
 import com.google.protobuf.util.JsonFormat
-import scalapb.{GeneratedMessage, GeneratedMessageCompanion, Message}
+import scalapb.{GeneratedMessage, GeneratedMessageCompanion}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -16,7 +16,7 @@ object ProtoMacrosJava {
       macro ProtoMacrosJava.protoValueInterpolation
   }
 
-  implicit class ScalaBPMessageOps[A <: GeneratedMessage with Message[A]](
+  implicit class ScalaBPMessageOps[A <: GeneratedMessage](
     val companion: GeneratedMessageCompanion[A]
   ) extends AnyVal {
     def fromJsonConstant(json: String): A = macro ProtoMacrosJava.fromJsonConstantImpl0[A]
@@ -65,7 +65,9 @@ class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommo
     fromJsonInternal(companion, json, javaType)
   }
 
-  override def fromJsonConstantImpl[A <: GeneratedMessage with Message[A]: c.WeakTypeTag: GeneratedMessageCompanion](
+  override def fromJsonConstantImpl[
+    A <: GeneratedMessage: c.WeakTypeTag: GeneratedMessageCompanion
+  ](
     string: String
   ): c.Tree = {
     val q"$_($companion)" = c.prefix.tree

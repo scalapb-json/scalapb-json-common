@@ -43,7 +43,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
     code
   }
 
-  def fromJsonConstantImpl0[A <: scalapb.GeneratedMessage with scalapb.Message[A]: c.WeakTypeTag](
+  def fromJsonConstantImpl0[A <: scalapb.GeneratedMessage: c.WeakTypeTag](
     json: c.Tree
   ): c.Tree = {
     val Literal(Constant(str: String)) = json
@@ -59,7 +59,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
   def fromJsonImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree
 
   def fromJsonConstantImpl[
-    A <: scalapb.GeneratedMessage with scalapb.Message[A]: c.WeakTypeTag: GeneratedMessageCompanion
+    A <: scalapb.GeneratedMessage: c.WeakTypeTag: GeneratedMessageCompanion
   ](string: String): c.Tree
 
   def protoStructInterpolation(): c.Tree =
