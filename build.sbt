@@ -13,7 +13,7 @@ val utestVersion = Def.setting {
     case Some((2, v)) if v <= 11 =>
       "0.6.8"
     case _ =>
-      "0.6.9"
+      "0.7.4"
   }
 }
 
