@@ -179,9 +179,7 @@ object ScalapbJsonCommon {
       .split(",")
       .toIterator
       .withFilter(_.nonEmpty)
-      .map { path =>
-        NameUtils.camelCaseToSnakeCase(path)
-      }
+      .map { path => NameUtils.camelCaseToSnakeCase(path) }
       .toList
     FieldMask(result)
   }

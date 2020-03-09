@@ -2,20 +2,11 @@ import scalapb.compiler.Version._
 import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
-val Scala211 = "2.11.12"
 val Scala212 = "2.12.10"
 val Scala213 = "2.13.1"
 val scalatestVersion = "3.1.1"
 
 val scalapbV = settingKey[String]("")
-val utestVersion = Def.setting {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, v)) if v <= 11 =>
-      "0.6.8"
-    case _ =>
-      "0.7.4"
-  }
-}
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
@@ -68,11 +59,12 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
-      val g = "https://raw.githubusercontent.com/scalapb-json/scalapb-json-common/" + tagOrHash.value
+      val g =
+        "https://raw.githubusercontent.com/scalapb-json/scalapb-json-common/" + tagOrHash.value
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC3",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC4",
     ),
   )
   .settings(
@@ -139,14 +131,9 @@ noPublish
 lazy val commonSettings = Def.settings(
   scalapbV := scalapbVersion,
   unmanagedResources in Compile += (baseDirectory in LocalRootProject).value / "LICENSE.txt",
-  scalaVersion := Scala211,
-  crossScalaVersions := Seq(Scala212, Scala211, Scala213),
-  scalacOptions ++= PartialFunction
-    .condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((2, v)) if v >= 11 => unusedWarnings
-    }
-    .toList
-    .flatten,
+  scalaVersion := Scala212,
+  crossScalaVersions := Seq(Scala212, Scala213),
+  scalacOptions ++= unusedWarnings,
   Seq(Compile, Test).flatMap(c => scalacOptions in (c, console) --= unusedWarnings),
   scalacOptions ++= Seq("-feature", "-deprecation", "-language:existentials"),
   licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
@@ -161,7 +148,7 @@ lazy val commonSettings = Def.settings(
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % utestVersion.value % "test"
+    "com.lihaoyi" %%% "utest" % "0.7.4" % "test"
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   pomExtra in Global := {
