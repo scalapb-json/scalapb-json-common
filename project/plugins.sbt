@@ -12,7 +12,7 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.2")
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.4")
 
 // Could't update to 0.99.28 if use sbt 1.2.x
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.27")
