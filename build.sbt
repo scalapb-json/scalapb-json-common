@@ -64,7 +64,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC5",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
     ),
   )
   .settings(
