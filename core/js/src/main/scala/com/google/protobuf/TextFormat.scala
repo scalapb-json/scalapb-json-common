@@ -10,7 +10,7 @@ object TextFormat {
     column: Int,
     message: String
   ) extends java.io.IOException(s"${line}:${column}: ${message}") {
-    def this(message: String) {
+    def this(message: String) = {
       this(-1, -1, message)
     }
   }
