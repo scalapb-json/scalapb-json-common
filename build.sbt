@@ -4,7 +4,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala212 = "2.12.11"
 val Scala213 = "2.13.2"
-val scalatestVersion = "3.1.1"
+val scalatestVersion = "3.1.2"
 
 val scalapbV = settingKey[String]("")
 
@@ -69,7 +69,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
   .settings(
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.6.3" % "test",
+    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.0" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
   .platformsSettings(JSPlatform)(
