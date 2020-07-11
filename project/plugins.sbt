@@ -14,7 +14,6 @@ addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")
 
-// Could't update to 0.99.28 if use sbt 1.2.x
-addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.27")
+addSbtPlugin("com.thesamet" % "sbt-protoc" % "0.99.34")
 
-libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.10.4"
+libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.10.7"

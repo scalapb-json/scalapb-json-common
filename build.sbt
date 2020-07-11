@@ -19,6 +19,70 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
+lazy val forkCompilerProject = project.settings(
+  commonSettings,
+  libraryDependencies += scalaOrganization.value % "scala-compiler" % scalaVersion.value,
+  fork in run := true,
+  Compile / run / mainClass := Some("scala.tools.nsc.Main"),
+  noPublish
+)
+
+val forkScalaCompiler = Def.task {
+  import java.io.File
+  import java.util.Optional
+  import xsbti.{AnalysisCallback, Reporter}
+  import xsbti.compile._
+  val options = classpathOptions.value
+  sbt.internal.inc.ZincUtil.compilers(
+    instance = Keys.scalaInstance.value,
+    classpathOptions = options,
+    javaHome = None,
+    new ScalaCompiler {
+      override def classpathOptions = options
+
+      override def compile(
+        source: Array[File],
+        changes: DependencyChanges,
+        options: Array[String],
+        output: Output,
+        callback: AnalysisCallback,
+        reporter: Reporter,
+        cache: GlobalsCache,
+        log: xsbti.Logger,
+        progressOpt: Optional[CompileProgress]
+      ): Unit = {
+        val dir = output.getSingleOutput.get
+        IO.delete(dir)
+        dir.mkdir
+        val args: Array[String] =
+          options ++ Array("-d", dir.getAbsolutePath) ++ source.map(_.getAbsolutePath)
+        val s = state.value
+        val e = Project.extract(s)
+        e.runInputTask(
+          forkCompilerProject / Compile / run,
+          args.mkString(" ", " ", ""),
+          s
+        )
+      }
+
+      override def compile(
+        source: Array[File],
+        changes: DependencyChanges,
+        callback: AnalysisCallback,
+        log: xsbti.Logger,
+        reporter: Reporter,
+        progress: CompileProgress,
+        compiler: CachedCompiler
+      ): Unit = {
+        ???
+      }
+
+      override def scalaInstance =
+        Keys.scalaInstance.value
+    }
+  )
+}
+
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
@@ -104,8 +168,13 @@ lazy val macrosJava = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform)
   .settings(
     commonSettings,
+    compilers := forkScalaCompiler.value,
+    Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
-    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
+  )
+  .jsSettings(
+    Compile / scalaJSUseMainModuleInitializer := true,
   )
   .configure(_ dependsOn (macros, macrosJava))
 
@@ -136,10 +205,6 @@ lazy val commonSettings = Def.settings(
   organization := "io.github.scalapb-json",
   Project.inConfig(Test)(sbtprotoc.ProtocPlugin.protobufConfigSettings),
   PB.targets in Compile := Nil,
-  // Can't use -v380
-  // https://github.com/scalapb/ScalaPB/commit/ff99b075625fe684ce2eef7686d587fdbbf19b62
-  // https://github.com/scalapb/ScalaPB/commit/d3cc69515ea90f1af7eaf2732d22facb6c9e95e3
-  PB.protocVersion := "-v371",
   PB.protoSources in Test := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
