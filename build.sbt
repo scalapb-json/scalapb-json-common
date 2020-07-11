@@ -66,16 +66,14 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
     ),
+    PB.targets in Test := Seq(
+      scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
+    ),
   )
   .settings(
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.0" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
-  )
-  .platformsSettings(JSPlatform)(
-    PB.targets in Test := Seq(
-      scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
-    )
   )
 
 lazy val macros = project.settings(
