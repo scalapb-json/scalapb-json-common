@@ -19,6 +19,11 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
+lazy val codeGen = project
+  libraryDependencies ++= Seq(
+    "com.thesamet.scalapb" %% "compilerplugin" % "0.10.7"
+  )
+
 lazy val core = crossProject(JVMPlatform, JSPlatform)
   .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
@@ -45,12 +50,25 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "scalapbVersion" -> scalapbV,
       scalaVersion,
       version
-    )
+    ),
+    Compile / codeGenClasspath := (codeGen / Compile / fullClasspath).value,
+    Test / codeGenClasspath := (codeGen / Test / fullClasspath).value,
   )
+  .enablePlugins(LocalCodeGenPlugin)
   .jvmSettings(
     PB.targets in Test := Seq(
+      genModule("scalapb.ScalaPbCodeGenerator$") -> (Test / sourceManaged).value
+/*
       PB.gens.java -> (sourceManaged in Test).value,
+      protocbridge.Target(
+        generator = PB.gens.plugin("scala"),
+        outputPath = (sourceManaged in Test).value,
+        options = scalapb.gen(
+          javaConversions = true
+        )._2
+      )
       scalapb.gen(javaConversions = true) -> (sourceManaged in Test).value
+*/
     ),
     libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion % "test"
@@ -66,16 +84,23 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
     ),
+    PB.targets in Test := Seq(
+      genModule("scalapb.ScalaPbCodeGenerator$") -> (Test / sourceManaged).value
+/*
+      protocbridge.Target(
+        generator = PB.gens.plugin("scala"),
+        outputPath = (sourceManaged in Test).value,
+        options = scalapb.gen(
+          javaConversions = false
+        )._2
+      )
+*/
+    )
   )
   .settings(
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.0" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
-  )
-  .platformsSettings(JSPlatform)(
-    PB.targets in Test := Seq(
-      scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
-    )
   )
 
 lazy val macros = project.settings(
