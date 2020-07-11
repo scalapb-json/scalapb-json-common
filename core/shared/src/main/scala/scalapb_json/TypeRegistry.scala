@@ -4,7 +4,8 @@ import scalapb._
 
 import ScalapbJsonCommon.GenericCompanion
 
-/** TypeRegistry is used to map the @type field in Any messages to a ScalaPB generated message.
+/**
+ * TypeRegistry is used to map the @type field in Any messages to a ScalaPB generated message.
  *
  * You need to
  */
@@ -12,8 +13,8 @@ case class TypeRegistry(
   companions: Map[String, GenericCompanion] = Map.empty,
   private val filesSeen: Set[String] = Set.empty
 ) {
-  def addMessage[T <: GeneratedMessage](
-    implicit cmp: GeneratedMessageCompanion[T]
+  def addMessage[T <: GeneratedMessage](implicit
+    cmp: GeneratedMessageCompanion[T]
   ): TypeRegistry = {
     addMessageByCompanion(cmp)
   }

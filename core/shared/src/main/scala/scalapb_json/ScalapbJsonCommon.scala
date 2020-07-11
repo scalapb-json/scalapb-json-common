@@ -7,7 +7,7 @@ import scalapb._
 import scalapb.descriptors._
 
 object ScalapbJsonCommon {
-  def unsignedInt(n: Int): Long = n & 0X00000000FFFFFFFFL
+  def unsignedInt(n: Int): Long = n & 0x00000000ffffffffL
 
   type GenericCompanion = GeneratedMessageCompanion[T] forSome {
     type T <: GeneratedMessage
@@ -80,7 +80,7 @@ object ScalapbJsonCommon {
   def parseUint32(value: String): PValue = {
     try {
       val result = value.toLong
-      if (result < 0 || result > 0XFFFFFFFFL)
+      if (result < 0 || result > 0xffffffffL)
         throw new JsonFormatException(s"Out of range uint32 value: $value")
       return PInt(result.toInt)
     } catch {
@@ -88,7 +88,7 @@ object ScalapbJsonCommon {
       case _: Exception => // Fall through.
     }
     parseBigDecimal(value).toBigIntExact.map { intVal =>
-      if (intVal < 0 || intVal > 0XFFFFFFFFL)
+      if (intVal < 0 || intVal > 0xffffffffL)
         throw new JsonFormatException(s"Out of range uint32 value: $value")
       PLong(intVal.intValue)
     } getOrElse {
@@ -117,42 +117,46 @@ object ScalapbJsonCommon {
   private[this] val PFloatPosInf = PFloat(Float.PositiveInfinity)
   private[this] val PFloatNegInf = PFloat(Float.NegativeInfinity)
 
-  def parseDouble(value: String): PDouble = value match {
-    case "NaN" => PDoubleNaN
-    case "Infinity" => PDoublePosInf
-    case "-Infinity" => PDoubleNegInf
-    case v =>
-      try {
-        val bd = new java.math.BigDecimal(v)
-        if (bd.compareTo(MAX_DOUBLE) > 0 || bd.compareTo(MIN_DOUBLE) < 0) {
-          throw new JsonFormatException("Out of range double value: " + v)
+  def parseDouble(value: String): PDouble =
+    value match {
+      case "NaN" => PDoubleNaN
+      case "Infinity" => PDoublePosInf
+      case "-Infinity" => PDoubleNegInf
+      case v =>
+        try {
+          val bd = new java.math.BigDecimal(v)
+          if (bd.compareTo(MAX_DOUBLE) > 0 || bd.compareTo(MIN_DOUBLE) < 0) {
+            throw new JsonFormatException("Out of range double value: " + v)
+          }
+          PDouble(bd.doubleValue)
+        } catch {
+          case e: JsonFormatException => throw e
+          case e: Exception =>
+            throw new JsonFormatException("Not a double value: " + v, e)
         }
-        PDouble(bd.doubleValue)
-      } catch {
-        case e: JsonFormatException => throw e
-        case e: Exception =>
-          throw new JsonFormatException("Not a double value: " + v, e)
-      }
-  }
+    }
 
-  def parseFloat(value: String): PFloat = value match {
-    case "NaN" => PFloatNaN
-    case "Infinity" => PFloatPosInf
-    case "-Infinity" => PFloatNegInf
-    case v =>
-      try {
-        val value = java.lang.Double.parseDouble(v)
-        if ((value > Float.MaxValue * (1.0 + EPSILON)) ||
-          (value < -Float.MaxValue * (1.0 + EPSILON))) {
-          throw new JsonFormatException("Out of range float value: " + value)
+  def parseFloat(value: String): PFloat =
+    value match {
+      case "NaN" => PFloatNaN
+      case "Infinity" => PFloatPosInf
+      case "-Infinity" => PFloatNegInf
+      case v =>
+        try {
+          val value = java.lang.Double.parseDouble(v)
+          if (
+            (value > Float.MaxValue * (1.0 + EPSILON)) ||
+            (value < -Float.MaxValue * (1.0 + EPSILON))
+          ) {
+            throw new JsonFormatException("Out of range float value: " + value)
+          }
+          PFloat(value.toFloat)
+        } catch {
+          case e: JsonFormatException => throw e
+          case e: Exception =>
+            throw new JsonFormatException("Not a float value: " + v, e)
         }
-        PFloat(value.toFloat)
-      } catch {
-        case e: JsonFormatException => throw e
-        case e: Exception =>
-          throw new JsonFormatException("Not a float value: " + v, e)
-      }
-  }
+    }
 
   def jsonName(fd: FieldDescriptor): String = {
     // protoc<3 doesn't know about json_name, so we fill it in if it's not populated.

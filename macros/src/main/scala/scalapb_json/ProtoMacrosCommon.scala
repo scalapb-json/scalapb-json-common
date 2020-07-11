@@ -82,12 +82,13 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
     new Liftable[com.google.protobuf.struct.NullValue] {
       import com.google.protobuf.struct.NullValue
 
-      override def apply(value: NullValue) = value match {
-        case NullValue.NULL_VALUE =>
-          q"_root_.com.google.protobuf.struct.NullValue.NULL_VALUE"
-        case NullValue.Unrecognized(v) =>
-          q"_root_.com.google.protobuf.struct.NullValue.Unrecognized($v)"
-      }
+      override def apply(value: NullValue) =
+        value match {
+          case NullValue.NULL_VALUE =>
+            q"_root_.com.google.protobuf.struct.NullValue.NULL_VALUE"
+          case NullValue.Unrecognized(v) =>
+            q"_root_.com.google.protobuf.struct.NullValue.Unrecognized($v)"
+        }
     }
 
   implicit val StructLiftable: Liftable[Struct] =
