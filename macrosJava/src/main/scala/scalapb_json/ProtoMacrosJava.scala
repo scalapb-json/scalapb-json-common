@@ -51,7 +51,7 @@ class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommo
     val packageAndOuter = javaType.getCanonicalName.split('.').init
     val p = packageAndOuter.map(TermName(_)).foldLeft(Ident(TermName("_root_")): Tree)(Select(_, _))
     val x = Select(p, TermName(javaType.getSimpleName))
-    val builder, parser = TermName(c.freshName)
+    val builder, parser = TermName(c.freshName())
     q"""
       val $parser = _root_.com.google.protobuf.util.JsonFormat.parser()
       val $builder = $x.newBuilder()

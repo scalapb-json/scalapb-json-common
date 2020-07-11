@@ -18,7 +18,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
   }
 
   def fromJsonEitherImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
-    val error = TermName(c.freshName)
+    val error = TermName(c.freshName())
     q"""try{
       _root_.scala.Right(${fromJsonImpl[A](json)})
     } catch {
@@ -28,7 +28,7 @@ abstract class ProtoMacrosCommon(val c: blackbox.Context) {
   }
 
   def fromJsonTryImpl[A: c.WeakTypeTag](json: c.Tree): c.Tree = {
-    val error = TermName(c.freshName)
+    val error = TermName(c.freshName())
     q"""try{
       _root_.scala.util.Success(${fromJsonImpl[A](json)})
     } catch {
