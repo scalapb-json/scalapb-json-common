@@ -26,7 +26,3 @@ libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros" % "0.6.
 ```scala
 libraryDependencies += "io.github.scalapb-json" %% "scalapb-json-macros-java" % "0.6.2"
 ```
-
-### for Scala 2.10.x
-
-see https://github.com/scalapb-json/scalapb-json-common/tree/0.3.x
