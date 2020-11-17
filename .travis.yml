@@ -19,3 +19,6 @@ matrix:
   include:
   - scala: 2.12.12
     jdk: openjdk11
+  - scala: 3.0.0-M1
+    script:
+    - sbt -v scalafmtCheckAll scalafmtSbtCheck "++ ${TRAVIS_SCALA_VERSION}! -v" coreJVM/compile

@@ -207,9 +207,9 @@ lazy val commonSettings = Def.settings(
   PB.targets in Compile := Nil,
   PB.protoSources in Test := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
-    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
-    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % "0.7.5" % "test"
+    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value withDottyCompat scalaVersion.value,
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test" withDottyCompat scalaVersion.value,
+    "com.lihaoyi" %%% "utest" % "0.7.5" % "test" withDottyCompat scalaVersion.value,
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   pomExtra in Global := {
