@@ -30,7 +30,7 @@ lazy val forkCompilerProject = project.settings(
 val forkScalaCompiler = Def.task {
   import java.io.File
   import java.util.Optional
-  import xsbti.{AnalysisCallback, Reporter}
+  import xsbti.{AnalysisCallback, FileConverter, Reporter, VirtualFile}
   import xsbti.compile._
   val options = classpathOptions.value
   sbt.internal.inc.ZincUtil.compilers(
@@ -41,21 +41,31 @@ val forkScalaCompiler = Def.task {
       override def classpathOptions = options
 
       override def compile(
-        source: Array[File],
+        source: Array[VirtualFile],
+        classpath: Array[VirtualFile],
+        converter: FileConverter,
         changes: DependencyChanges,
         options: Array[String],
         output: Output,
         callback: AnalysisCallback,
         reporter: Reporter,
-        cache: GlobalsCache,
+        progressOpt: Optional[CompileProgress],
         log: xsbti.Logger,
-        progressOpt: Optional[CompileProgress]
       ): Unit = {
-        val dir = output.getSingleOutput.get
+        val dir = output.getSingleOutputAsPath.get.toFile
         IO.delete(dir)
         dir.mkdir
-        val args: Array[String] =
-          options ++ Array("-d", dir.getAbsolutePath) ++ source.map(_.getAbsolutePath)
+        val args: Array[String] = Array(
+          options,
+          Array("-d", dir.getAbsolutePath),
+          Array(
+            "-classpath",
+            classpath
+              .map(c => converter.toPath(c).toAbsolutePath.toString)
+              .mkString(File.pathSeparator)
+          ),
+          source.map(converter.toPath(_).toFile.getAbsolutePath)
+        ).flatten
         val s = state.value
         val e = Project.extract(s)
         e.runInputTask(
@@ -63,18 +73,6 @@ val forkScalaCompiler = Def.task {
           args.mkString(" ", " ", ""),
           s
         )
-      }
-
-      override def compile(
-        source: Array[File],
-        changes: DependencyChanges,
-        callback: AnalysisCallback,
-        log: xsbti.Logger,
-        reporter: Reporter,
-        progress: CompileProgress,
-        compiler: CachedCompiler
-      ): Unit = {
-        ???
       }
 
       override def scalaInstance =
