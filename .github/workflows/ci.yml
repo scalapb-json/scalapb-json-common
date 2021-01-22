@@ -38,7 +38,7 @@ jobs:
             sbt -v \
             scalafmtCheckAll \
             scalafmtSbtCheck \
-            "++ 3.0.0-M1! -v" \
+            "++ 3.0.0-M3! -v" \
             "+ coreJVM/compile"
             ;;
           *)
