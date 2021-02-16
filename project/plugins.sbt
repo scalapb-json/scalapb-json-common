@@ -1,4 +1,4 @@
-addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.2" exclude ("org.scala-sbt", "compiler-interface"))
+addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.3" exclude ("org.scala-sbt", "compiler-interface"))
 
 addSbtPlugin("com.github.scalaprops" % "sbt-scalaprops" % "0.4.1")
 
