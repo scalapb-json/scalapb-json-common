@@ -126,7 +126,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.1.0",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.2.0",
     ),
     PB.targets in Test := Seq(
       scalapb.gen(javaConversions = false) -> (sourceManaged in Test).value
