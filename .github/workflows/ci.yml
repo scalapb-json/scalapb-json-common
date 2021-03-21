@@ -30,7 +30,10 @@ jobs:
             sbt -v \
             scalafmtCheckAll \
             scalafmtSbtCheck \
-            "+ test" \
+            "+ coreJVM/test" \
+            "+ coreJS/test" \
+            "+ coreNative/test" \
+            "+ macrosJava/test" \
             "+ testsJVM/run" \
             "+ testsJS/run"
             ;;

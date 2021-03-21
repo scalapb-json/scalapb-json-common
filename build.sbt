@@ -81,7 +81,7 @@ val forkScalaCompiler = Def.task {
   )
 }
 
-lazy val core = crossProject(JVMPlatform, JSPlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
   .settings(
@@ -128,6 +128,23 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.2.0",
     ),
+  )
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    Seq(Compile, Test).map { x =>
+      x / unmanagedSourceDirectories += {
+        baseDirectory.value.getParentFile / "jvm-js" / "src" / Defaults.nameForSrc(
+          x.name
+        ) / "scala",
+      }
+    },
+  )
+  .platformsSettings(JSPlatform, NativePlatform)(
+    Seq(Compile, Test).map { x =>
+      x / unmanagedSourceDirectories += {
+        baseDirectory.value.getParentFile / "js-native" / "src" / Defaults
+          .nameForSrc(x.name) / "scala",
+      }
+    },
     (Test / PB.targets) := Seq(
       scalapb.gen(javaConversions = false) -> (Test / sourceManaged).value
     ),
@@ -163,7 +180,7 @@ lazy val macrosJava = project
     coreJVM % "test->test",
   )
 
-lazy val tests = crossProject(JVMPlatform, JSPlatform)
+lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
     compilers := forkScalaCompiler.value,
@@ -207,7 +224,7 @@ lazy val commonSettings = Def.settings(
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value withDottyCompat scalaVersion.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test" withDottyCompat scalaVersion.value,
-    "com.lihaoyi" %%% "utest" % "0.7.7" % "test" withDottyCompat scalaVersion.value,
+    "com.lihaoyi" %%% "utest" % "0.7.7" % "test",
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   (Global / pomExtra) := {
