@@ -14,8 +14,9 @@ final class MemorizedFieldNameMap(
   def this() = this(new ConcurrentHashMap())
 
   def get(descriptor: Descriptor): Map[String, FieldDescriptor] = {
-    fieldNameMap.putIfAbsent(
-      descriptor, {
+    fieldNameMap.computeIfAbsent(
+      descriptor,
+      { _ =>
         val mapBuilder = Map.newBuilder[String, FieldDescriptor]
         descriptor.fields.foreach { fd =>
           mapBuilder += fd.name -> fd
