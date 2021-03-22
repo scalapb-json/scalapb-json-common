@@ -14,11 +14,8 @@ final class MemorizedFieldNameMap(
   def this() = this(new ConcurrentHashMap())
 
   def get(descriptor: Descriptor): Map[String, FieldDescriptor] = {
-    // use `get` and `put` instead of `computeIfAbsent` on purpose because
-    // - can't use `SAM conversion` with Scala 2.11
-    // - does not need strict consistency in this case
-    fieldNameMap.get(descriptor) match {
-      case null =>
+    fieldNameMap.putIfAbsent(
+      descriptor, {
         val mapBuilder = Map.newBuilder[String, FieldDescriptor]
         descriptor.fields.foreach { fd =>
           mapBuilder += fd.name -> fd
@@ -27,8 +24,7 @@ final class MemorizedFieldNameMap(
         val value = mapBuilder.result()
         fieldNameMap.put(descriptor, value)
         value
-      case value =>
-        value
-    }
+      }
+    )
   }
 }
