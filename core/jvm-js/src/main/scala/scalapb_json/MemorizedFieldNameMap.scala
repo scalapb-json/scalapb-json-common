@@ -22,9 +22,7 @@ final class MemorizedFieldNameMap(
           mapBuilder += fd.name -> fd
           mapBuilder += ScalapbJsonCommon.jsonName(fd) -> fd
         }
-        val value = mapBuilder.result()
-        fieldNameMap.put(descriptor, value)
-        value
+        mapBuilder.result()
       }
     )
   }
