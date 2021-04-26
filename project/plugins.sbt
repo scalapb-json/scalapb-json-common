@@ -20,4 +20,4 @@ addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.0")
 
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.0.0")
 
-libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.11.1"
+libraryDependencies += "com.thesamet.scalapb" %% "compilerplugin" % "0.11.2"
