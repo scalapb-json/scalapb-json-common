@@ -6,6 +6,10 @@ val Scala212 = "2.12.13"
 val Scala213 = "2.13.5"
 val scalatestVersion = "3.2.8"
 
+val isScala3 = Def.setting(
+  CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
+)
+
 val scalapbV = settingKey[String]("")
 
 val tagName = Def.setting {
@@ -21,9 +25,21 @@ val unusedWarnings = Seq("-Ywarn-unused")
 
 lazy val forkCompilerProject = project.settings(
   commonSettings,
-  libraryDependencies += scalaOrganization.value % "scala-compiler" % scalaVersion.value,
+  libraryDependencies += {
+    if (isScala3.value) {
+      scalaOrganization.value %% "scala3-compiler" % scalaVersion.value
+    } else {
+      scalaOrganization.value % "scala-compiler" % scalaVersion.value
+    }
+  },
   run / fork := true,
-  Compile / run / mainClass := Some("scala.tools.nsc.Main"),
+  Compile / run / mainClass := Some(
+    if (isScala3.value) {
+      "dotty.tools.dotc.Main"
+    } else {
+      "scala.tools.nsc.Main"
+    }
+  ),
   noPublish
 )
 
@@ -114,6 +130,15 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       PB.gens.java -> (Test / sourceManaged).value,
       scalapb.gen(javaConversions = true) -> (Test / sourceManaged).value
     ),
+    compileOrder := {
+      if (isScala3.value) {
+        // https://github.com/lampepfl/dotty/issues/10956
+        // https://github.com/lampepfl/dotty/issues/6138
+        CompileOrder.JavaThenScala
+      } else {
+        compileOrder.value
+      }
+    },
     libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion % "test"
     )
@@ -123,7 +148,11 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g =
         "https://raw.githubusercontent.com/scalapb-json/scalapb-json-common/" + tagOrHash.value
-      s"-P:scalajs:mapSourceURI:$a->$g/"
+      if (isScala3.value) {
+        "-scalajs-mapSourceURI:$a->$g/"
+      } else {
+        "-P:scalajs:mapSourceURI:$a->$g/"
+      }
     },
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.2.2",
@@ -151,7 +180,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .settings(
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.2" % "test",
+    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.2" % "test" cross CrossVersion.for3Use2_13,
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
 
@@ -161,8 +190,16 @@ lazy val macros = project.settings(
   name := UpdateReadme.scalapbJsonMacrosName,
   libraryDependencies ++= Seq(
     "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
-    scalaOrganization.value % "scala-reflect" % scalaVersion.value,
   ),
+  libraryDependencies ++= {
+    if (isScala3.value) {
+      Nil
+    } else {
+      Seq(
+        scalaOrganization.value % "scala-reflect" % scalaVersion.value,
+      )
+    }
+  },
 )
 
 lazy val macrosJava = project
