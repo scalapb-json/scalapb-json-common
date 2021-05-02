@@ -41,7 +41,7 @@ jobs:
             sbt -v \
             scalafmtCheckAll \
             scalafmtSbtCheck \
-            "++ 3.0.0-RC1! -v" \
+            "++ 3.0.0-RC3! -v" \
             "+ coreJVM/compile"
             ;;
           *)
