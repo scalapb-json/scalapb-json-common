@@ -180,7 +180,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .settings(
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.3" % "test" cross CrossVersion.for3Use2_13,
+    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.3" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
 
@@ -259,8 +259,8 @@ lazy val commonSettings = Def.settings(
   Compile / PB.targets := Nil,
   (Test / PB.protoSources) := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
-    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value cross CrossVersion.for3Use2_13,
-    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test" cross CrossVersion.for3Use2_13,
+    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
     "com.lihaoyi" %%% "utest" % "0.7.10" % "test",
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
