@@ -242,7 +242,8 @@ lazy val macrosJava = project
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
-    )
+    ),
+    disableScala3,
   )
   .dependsOn(
     macros,
