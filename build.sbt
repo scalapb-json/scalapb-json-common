@@ -23,6 +23,33 @@ val tagOrHash = Def.setting {
 
 val unusedWarnings = Seq("-Ywarn-unused")
 
+lazy val disableScala3 = Def.settings(
+  libraryDependencies := {
+    if (isScala3.value) {
+      Nil
+    } else {
+      libraryDependencies.value
+    }
+  },
+  Seq(Compile, Test).map { x =>
+    (x / sources) := {
+      if (isScala3.value) {
+        Nil
+      } else {
+        (x / sources).value
+      }
+    }
+  },
+  Test / test := {
+    if (isScala3.value) {
+      ()
+    } else {
+      (Test / test).value
+    }
+  },
+  publish / skip := isScala3.value,
+)
+
 lazy val forkCompilerProject = project.settings(
   commonSettings,
   libraryDependencies += {
@@ -170,8 +197,9 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .platformsSettings(JSPlatform, NativePlatform)(
     Seq(Compile, Test).map { x =>
       x / unmanagedSourceDirectories += {
-        baseDirectory.value.getParentFile / "js-native" / "src" / Defaults
-          .nameForSrc(x.name) / "scala",
+        baseDirectory.value.getParentFile / "js-native" / "src" / Defaults.nameForSrc(
+          x.name
+        ) / "scala",
       }
     },
     (Test / PB.targets) := Seq(
@@ -182,6 +210,9 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.3" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+  )
+  .nativeSettings(
+    disableScala3
   )
 
 lazy val macros = project.settings(
@@ -227,6 +258,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .jsSettings(
     Compile / scalaJSUseMainModuleInitializer := true,
+  )
+  .nativeSettings(
+    disableScala3
   )
   .configure(_ dependsOn (macros, macrosJava))
 
