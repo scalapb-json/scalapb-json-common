@@ -16,13 +16,15 @@ final class MemorizedFieldNameMap(
   def get(descriptor: Descriptor): Map[String, FieldDescriptor] = {
     fieldNameMap.computeIfAbsent(
       descriptor,
-      { _ =>
-        val mapBuilder = Map.newBuilder[String, FieldDescriptor]
-        descriptor.fields.foreach { fd =>
-          mapBuilder += fd.name -> fd
-          mapBuilder += ScalapbJsonCommon.jsonName(fd) -> fd
+      new java.util.function.Function[Descriptor, Map[String, FieldDescriptor]] {
+        override def apply(key: Descriptor) = {
+          val mapBuilder = Map.newBuilder[String, FieldDescriptor]
+          descriptor.fields.foreach { fd =>
+            mapBuilder += fd.name -> fd
+            mapBuilder += ScalapbJsonCommon.jsonName(fd) -> fd
+          }
+          mapBuilder.result()
         }
-        mapBuilder.result()
       }
     )
   }
