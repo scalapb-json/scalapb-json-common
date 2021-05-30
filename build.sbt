@@ -4,6 +4,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val Scala212 = "2.12.14"
 val Scala213 = "2.13.6"
+val Scala3 = "3.0.0"
 val scalatestVersion = "3.2.9"
 
 val isScala3 = Def.setting(
@@ -254,6 +255,19 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     compilers := forkScalaCompiler.value,
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
+    Seq(Compile, Test).map { x =>
+      (x / unmanagedSourceDirectories) ++= {
+        if (CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 2)) {
+          Seq(
+            baseDirectory.value.getParentFile / "shared" / "src" / Defaults.nameForSrc(
+              x.name
+            ) / "scala-2",
+          )
+        } else {
+          Nil
+        }
+      },
+    },
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
   )
   .jsSettings(
@@ -283,7 +297,7 @@ lazy val commonSettings = Def.settings(
   scalapbV := scalapbVersion,
   (Compile / unmanagedResources) += (LocalRootProject / baseDirectory).value / "LICENSE.txt",
   scalaVersion := Scala212,
-  crossScalaVersions := Seq(Scala212, Scala213),
+  crossScalaVersions := Seq(Scala212, Scala213, Scala3),
   scalacOptions ++= {
     if (isScala3.value) {
       Nil
