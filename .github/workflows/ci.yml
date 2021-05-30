@@ -13,38 +13,19 @@ jobs:
       matrix:
         include:
           - java: 8
-            scala: 2
-          - java: 8
-            scala: 3
           - java: 11
-            scala: 2
     steps:
     - uses: actions/checkout@v2.3.4
     - uses: olafurpg/setup-scala@v10
       with:
         java-version: "adopt@1.${{ matrix.java }}"
     - uses: coursier/cache-action@v6
-    - run: |
-        case ${{ matrix.scala }} in
-          2)
-            sbt -v \
-            scalafmtCheckAll \
-            scalafmtSbtCheck \
-            "+ coreJVM/test" \
-            "+ coreJS/test" \
-            "+ coreNative/test" \
-            "+ macrosJava/test" \
-            "+ testsJVM/run" \
-            "+ testsJS/run"
-            ;;
-          3)
-            sbt -v \
-            scalafmtCheckAll \
-            scalafmtSbtCheck \
-            "++ 3.0.0! -v" \
-            "coreJVM/test"
-            ;;
-          *)
-            echo "unknown job"
-            exit 1
-        esac
+    - run: sbt -v
+           scalafmtCheckAll
+           scalafmtSbtCheck
+           "+ coreJVM/test"
+           "+ coreJS/test"
+           "+ coreNative/test"
+           "+ macrosJava/test"
+           "+ testsJVM/run"
+           "+ testsJS/run"
