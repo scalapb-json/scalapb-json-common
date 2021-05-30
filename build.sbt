@@ -250,7 +250,13 @@ lazy val commonSettings = Def.settings(
   (Compile / unmanagedResources) += (LocalRootProject / baseDirectory).value / "LICENSE.txt",
   scalaVersion := Scala212,
   crossScalaVersions := Seq(Scala212, Scala213),
-  scalacOptions ++= unusedWarnings,
+  scalacOptions ++= {
+    if (isScala3.value) {
+      Nil
+    } else {
+      unusedWarnings
+    }
+  },
   Seq(Compile, Test).flatMap(c => c / console / scalacOptions --= unusedWarnings),
   scalacOptions ++= Seq("-feature", "-deprecation", "-language:existentials"),
   licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
