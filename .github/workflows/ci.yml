@@ -42,7 +42,7 @@ jobs:
             scalafmtCheckAll \
             scalafmtSbtCheck \
             "++ 3.0.0! -v" \
-            "+ coreJVM/compile"
+            "coreJVM/compile"
             ;;
           *)
             echo "unknown job"
