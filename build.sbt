@@ -256,19 +256,6 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     compilers := forkScalaCompiler.value,
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
-    Seq(Compile, Test).map { x =>
-      (x / unmanagedSourceDirectories) ++= {
-        if (CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 2)) {
-          Seq(
-            baseDirectory.value.getParentFile / "shared" / "src" / Defaults.nameForSrc(
-              x.name
-            ) / "scala-2",
-          )
-        } else {
-          Nil
-        }
-      },
-    },
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
   )
   .jsSettings(
