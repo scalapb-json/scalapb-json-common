@@ -16,7 +16,7 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.5")
 
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.4")
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.1")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.2")
 
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.1.0")
 
