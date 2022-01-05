@@ -209,7 +209,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .settings(
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.3" % "test",
+    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.8.4" % "test",
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
   .nativeSettings(
