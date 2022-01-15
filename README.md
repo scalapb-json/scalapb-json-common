@@ -1,5 +1,5 @@
 # scalapb-json-common
-[![scaladoc](https://javadoc-badge.appspot.com/io.github.scalapb-json/scalapb-json-common_2.12.svg?label=scaladoc)](https://javadoc-badge.appspot.com/io.github.scalapb-json/scalapb-json-common_2.12/scalapb_json/index.html?javadocio=true)
+[![scaladoc](https://javadoc.io/badge2/io.github.scalapb-json/scalapb-json-common_3/javadoc.svg)](https://javadoc.io/doc/io.github.scalapb-json/scalapb-json-common_3/latest/api/scalapb_json.html)
 
 ## Dependency
 
