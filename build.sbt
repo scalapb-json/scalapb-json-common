@@ -303,7 +303,7 @@ lazy val commonSettings = Def.settings(
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % "0.7.10" % "test",
+    "com.lihaoyi" %%% "utest" % "0.7.11" % "test",
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   (Global / pomExtra) := {
