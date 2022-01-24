@@ -5,7 +5,7 @@ import sbtcrossproject.CrossPlugin.autoImport.crossProject
 val Scala212 = "2.12.15"
 val Scala213 = "2.13.8"
 val Scala3 = "3.1.1"
-val scalatestVersion = "3.2.10"
+val scalatestVersion = "3.2.11"
 
 val isScala3 = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
