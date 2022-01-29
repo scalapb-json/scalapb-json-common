@@ -213,7 +213,10 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   )
   .nativeSettings(
-    disableScala3
+    disableScala3,
+    libraryDependencies ++= Seq(
+      "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M1",
+    ),
   )
 
 lazy val macros = project.settings(
