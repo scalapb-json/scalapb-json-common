@@ -256,12 +256,19 @@ lazy val macrosJava = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
-    compilers := forkScalaCompiler.value,
+    compilers := {
+      if (scalaBinaryVersion.value == "3") {
+        compilers.value
+      } else {
+        forkScalaCompiler.value
+      }
+    },
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
   )
   .jsSettings(
+    crossScalaVersions -= Scala3, // TODO
     Compile / scalaJSUseMainModuleInitializer := true,
   )
   .nativeSettings(
