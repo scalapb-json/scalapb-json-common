@@ -31,3 +31,4 @@ jobs:
            "+ macrosJava/test"
            "+ testsJVM/run"
            "+ testsJS/run"
+           "+ doc"

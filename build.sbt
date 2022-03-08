@@ -33,14 +33,23 @@ lazy val disableScala3 = Def.settings(
       libraryDependencies.value
     }
   },
-  Seq(Compile, Test).map { x =>
-    (x / sources) := {
-      if (isScala3.value) {
-        Nil
-      } else {
-        (x / sources).value
+  Seq(Compile, Test).flatMap { x =>
+    Seq(
+      (x / doc / sources) := {
+        if (isScala3.value) {
+          Nil
+        } else {
+          (x / sources).value
+        }
+      },
+      (x / sources) := {
+        if (isScala3.value) {
+          Nil
+        } else {
+          (x / sources).value
+        }
       }
-    }
+    )
   },
   Test / test := {
     if (isScala3.value) {
@@ -243,13 +252,6 @@ lazy val macrosJava = project
     commonSettings,
     name := UpdateReadme.scalapbJsonMacrosJavaName,
     description := "Json/Protobuf convertor macros for ScalaPB with protobuf-java-util dependency",
-    compilers := {
-      if (scalaBinaryVersion.value == "3") {
-        forkScalaCompiler.value
-      } else {
-        compilers.value
-      }
-    },
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
@@ -264,6 +266,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
     compilers := forkScalaCompiler.value,
+    Seq(Compile, Test).map { x =>
+      x / doc := target.value / "dummy-doc-file",
+    },
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
