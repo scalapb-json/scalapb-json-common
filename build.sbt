@@ -271,7 +271,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .jsSettings(
     Compile / scalaJSUseMainModuleInitializer := true,
   )
-  .platformsSettings(JSPlatform, JSPlatform)(
+  .platformsSettings(JSPlatform, NativePlatform)(
     disableScala3
   )
   .configure(_ dependsOn (macros, macrosJava))
