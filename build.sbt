@@ -25,6 +25,7 @@ val tagOrHash = Def.setting {
 val unusedWarnings = Seq("-Ywarn-unused")
 
 lazy val disableScala3 = Def.settings(
+  crossScalaVersions -= Scala3,
   libraryDependencies := {
     if (isScala3.value) {
       Nil
@@ -242,11 +243,17 @@ lazy val macrosJava = project
     commonSettings,
     name := UpdateReadme.scalapbJsonMacrosJavaName,
     description := "Json/Protobuf convertor macros for ScalaPB with protobuf-java-util dependency",
+    compilers := {
+      if (scalaBinaryVersion.value == "3") {
+        forkScalaCompiler.value
+      } else {
+        compilers.value
+      }
+    },
     libraryDependencies ++= Seq(
       "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
-    ),
-    disableScala3,
+    )
   )
   .dependsOn(
     macros,
@@ -256,22 +263,15 @@ lazy val macrosJava = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
-    compilers := {
-      if (scalaBinaryVersion.value == "3") {
-        compilers.value
-      } else {
-        forkScalaCompiler.value
-      }
-    },
+    compilers := forkScalaCompiler.value,
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
     libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
   )
   .jsSettings(
-    crossScalaVersions -= Scala3, // TODO
     Compile / scalaJSUseMainModuleInitializer := true,
   )
-  .nativeSettings(
+  .platformsSettings(JSPlatform, JSPlatform)(
     disableScala3
   )
   .configure(_ dependsOn (macros, macrosJava))
