@@ -1,11 +1,26 @@
 package scalapb_json
 
 import com.google.protobuf.struct.{ListValue, NullValue, Struct, Value}
+import com.google.protobuf.wrappers.StringValue
+import org.scalatest.Assertions._
 import scalapb_json.ProtoMacros.*
 import scala.compiletime.testing.{typeCheckErrors, ErrorKind}
+import scalapb_json.ProtoMacrosJava._
 
 object ProtoMacrosTest {
   def main(args: Array[String]): Unit = {
+    assert(StringValue.fromJsonConstant("abc") == StringValue("abc"))
+
+    typeCheckErrors(""" StringValue.fromJsonConstant("{") """) match {
+      case List(err) =>
+        assert(err.kind == ErrorKind.Typer)
+        assert(
+          err.message.contains("""com.google.protobuf.InvalidProtocolBufferException"""),
+          err.message
+        )
+      case other =>
+        sys.error(s"unexpected error ${other}")
+    }
 
     typeCheckErrors(""" com.google.protobuf.struct.Struct.fromTextFormat("a") """) match {
       case List(err) =>
