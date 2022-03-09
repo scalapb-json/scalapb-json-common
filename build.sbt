@@ -279,8 +279,6 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
 
-commonSettings
-
 lazy val noPublish = Seq(
   PgpKeys.publishLocalSigned := {},
   PgpKeys.publishSigned := {},
@@ -288,8 +286,6 @@ lazy val noPublish = Seq(
   publish := {},
   Compile / publishArtifact := false
 )
-
-noPublish
 
 lazy val commonSettings = Def.settings(
   scalapbV := scalapbVersion,
@@ -374,8 +370,4 @@ val coreJVM = core.jvm
 val coreJS = core.js
 
 commonSettings
-publishArtifact := false
-publish := {}
-publishLocal := {}
-PgpKeys.publishSigned := {}
-PgpKeys.publishLocalSigned := {}
+noPublish
