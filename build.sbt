@@ -234,6 +234,7 @@ lazy val macros = project.settings(
   description := "Json/Protobuf convertor macros for ScalaPB",
   name := UpdateReadme.scalapbJsonMacrosName,
   libraryDependencies ++= Seq(
+    "org.typelevel" %%% "shapeless3-deriving" % "3.0.4",
     "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   ),
   libraryDependencies ++= {
@@ -295,7 +296,7 @@ lazy val noPublish = Seq(
 lazy val commonSettings = Def.settings(
   scalapbV := scalapbVersion,
   (Compile / unmanagedResources) += (LocalRootProject / baseDirectory).value / "LICENSE.txt",
-  scalaVersion := Scala212,
+  scalaVersion := Scala3,
   crossScalaVersions := Seq(Scala212, Scala213, Scala3),
   scalacOptions ++= {
     if (isScala3.value) {
