@@ -4,6 +4,7 @@ import com.google.protobuf.struct.NullValue
 import com.google.protobuf.struct.ListValue
 import com.google.protobuf.struct.Struct
 import com.google.protobuf.struct.Value
+import scalapb.UnknownFieldSet
 import scala.quoted.Expr
 import scala.quoted.FromExpr
 import scala.quoted.ToExpr
@@ -41,20 +42,24 @@ object ProtoMacrosCommon {
     new FromExpr[Value] {
       def unapply(v: Expr[Value])(using Quotes) = PartialFunction
         .condOpt(v) {
-          case '{ Value.Kind.Empty } =>
+          case '{ Value(Value.Kind.Empty) } =>
             Value.Kind.Empty
-          case '{ Value.Kind.NullValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.NullValue(${ Expr(value) })) } =>
             Value.Kind.NullValue(value)
-          case '{ Value.Kind.NumberValue(${ Expr(value) }) } =>
+          case '{ NullValue.fromValue(${ Expr(value) }) } =>
+            Value.Kind.NullValue(NullValue.fromValue(value))
+          case '{ Value(Value.Kind.NumberValue(${ Expr(value) })) } =>
             Value.Kind.NumberValue(value)
-          case '{ Value.Kind.StringValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.StringValue(${ Expr(value) })) } =>
             Value.Kind.StringValue(value)
-          case '{ Value.Kind.BoolValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.BoolValue(${ Expr(value) })) } =>
             Value.Kind.BoolValue(value)
-          case '{ Value.Kind.StructValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.StructValue(${ Expr(value) })) } =>
             Value.Kind.StructValue(value)
-          case '{ Value.Kind.ListValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.ListValue(${ Expr(value) })) } =>
             Value.Kind.ListValue(value)
+          case other =>
+            sys.error(other.show) // TODO
         }
         .map(Value.apply(_))
     }
@@ -73,12 +78,24 @@ object ProtoMacrosCommon {
       }
     }
 
+  implicit val protoUnknownFieldSetToExpr: ToExpr[UnknownFieldSet] =
+    new ToExpr[UnknownFieldSet] {
+      def apply(v: UnknownFieldSet)(using Quotes) = {
+        // TODO
+        ???
+      }
+    }
+
   implicit val protoListValueToExpr: ToExpr[ListValue] =
     new ToExpr[ListValue] {
       def apply(v: ListValue)(using Quotes) = '{
-        ListValue(${
-          Expr.ofList(v.values.map(summon[ToExpr[Value]].apply))
-        })
+        ListValue(
+          ${
+            Expr.ofList(v.values.map(summon[ToExpr[Value]].apply))
+          }
+// TODO
+//          ${ Expr(v.unknownFields) }
+        )
       }
     }
 

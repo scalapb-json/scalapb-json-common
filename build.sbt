@@ -233,7 +233,18 @@ lazy val macros = project.settings(
   commonSettings,
   description := "Json/Protobuf convertor macros for ScalaPB",
   name := UpdateReadme.scalapbJsonMacrosName,
+  scalapropsCoreSettings,
+  libraryDependencies ++= {
+    if (scalaBinaryVersion.value == "3") {
+      Seq(
+        "org.scala-lang" %% "scala3-staging" % scalaVersion.value % "test",
+      )
+    } else {
+      Nil
+    }
+  },
   libraryDependencies ++= Seq(
+    "com.github.scalaprops" %%% "scalaprops" % "0.9.0" % "test",
     "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
   ),
   libraryDependencies ++= {
