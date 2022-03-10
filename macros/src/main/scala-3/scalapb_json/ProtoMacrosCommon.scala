@@ -5,10 +5,59 @@ import com.google.protobuf.struct.ListValue
 import com.google.protobuf.struct.Struct
 import com.google.protobuf.struct.Value
 import scala.quoted.Expr
+import scala.quoted.FromExpr
 import scala.quoted.ToExpr
 import scala.quoted.Quotes
 
 object ProtoMacrosCommon {
+
+  implicit val protoNullValueFromExpr: FromExpr[NullValue] =
+    new FromExpr[NullValue] {
+      def unapply(v: Expr[NullValue])(using Quotes) = PartialFunction.condOpt(v) {
+        case '{ NullValue.NULL_VALUE } =>
+          NullValue.NULL_VALUE
+        case '{ NullValue.Unrecognized(${ Expr(int) }) } =>
+          NullValue.Unrecognized(int)
+      }
+    }
+
+  implicit val protoStructFromExpr: FromExpr[Struct] =
+    new FromExpr[Struct] {
+      def unapply(v: Expr[Struct])(using Quotes) = PartialFunction.condOpt(v) {
+        case '{ Struct(${ Expr(value) }) } =>
+          Struct(value)
+      }
+    }
+
+  implicit val protoListFromExpr: FromExpr[ListValue] =
+    new FromExpr[ListValue] {
+      def unapply(v: Expr[ListValue])(using Quotes) = PartialFunction.condOpt(v) {
+        case '{ ListValue(${ Expr(value) }) } =>
+          ListValue(value)
+      }
+    }
+
+  implicit val protoValueFromExpr: FromExpr[Value] =
+    new FromExpr[Value] {
+      def unapply(v: Expr[Value])(using Quotes) = PartialFunction
+        .condOpt(v) {
+          case '{ Value.Kind.Empty } =>
+            Value.Kind.Empty
+          case '{ Value.Kind.NullValue(${ Expr(value) }) } =>
+            Value.Kind.NullValue(value)
+          case '{ Value.Kind.NumberValue(${ Expr(value) }) } =>
+            Value.Kind.NumberValue(value)
+          case '{ Value.Kind.StringValue(${ Expr(value) }) } =>
+            Value.Kind.StringValue(value)
+          case '{ Value.Kind.BoolValue(${ Expr(value) }) } =>
+            Value.Kind.BoolValue(value)
+          case '{ Value.Kind.StructValue(${ Expr(value) }) } =>
+            Value.Kind.StructValue(value)
+          case '{ Value.Kind.ListValue(${ Expr(value) }) } =>
+            Value.Kind.ListValue(value)
+        }
+        .map(Value.apply(_))
+    }
 
   implicit val protoNullValueToExpr: ToExpr[NullValue] =
     new ToExpr[NullValue] {
