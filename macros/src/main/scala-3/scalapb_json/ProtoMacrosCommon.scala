@@ -41,19 +41,21 @@ object ProtoMacrosCommon {
     new FromExpr[Value] {
       def unapply(v: Expr[Value])(using Quotes) = PartialFunction
         .condOpt(v) {
-          case '{ Value.Kind.Empty } =>
+          case '{ Value(Value.Kind.Empty) } =>
             Value.Kind.Empty
-          case '{ Value.Kind.NullValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.NullValue(${ Expr(value) })) } =>
             Value.Kind.NullValue(value)
-          case '{ Value.Kind.NumberValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.NullValue(NullValue.fromValue(${ Expr(value) }))) } =>
+            Value.Kind.NullValue(NullValue.fromValue(value))
+          case '{ Value(Value.Kind.NumberValue(${ Expr(value) })) } =>
             Value.Kind.NumberValue(value)
-          case '{ Value.Kind.StringValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.StringValue(${ Expr(value) })) } =>
             Value.Kind.StringValue(value)
-          case '{ Value.Kind.BoolValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.BoolValue(${ Expr(value) })) } =>
             Value.Kind.BoolValue(value)
-          case '{ Value.Kind.StructValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.StructValue(${ Expr(value) })) } =>
             Value.Kind.StructValue(value)
-          case '{ Value.Kind.ListValue(${ Expr(value) }) } =>
+          case '{ Value(Value.Kind.ListValue(${ Expr(value) })) } =>
             Value.Kind.ListValue(value)
         }
         .map(Value.apply(_))

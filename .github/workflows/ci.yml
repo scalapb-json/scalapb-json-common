@@ -23,12 +23,13 @@ jobs:
         distribution: temurin
     - uses: coursier/cache-action@v6
     - run: sbt -v
-           scalafmtCheckAll
+           "+ scalafmtCheckAll"
            scalafmtSbtCheck
            "+ coreJVM/test"
            "+ coreJS/test"
            "+ coreNative/test"
            "+ macrosJava/test"
+           "+ macros/test"
            "+ testsJVM/run"
            "+ testsJS/run"
            "+ doc"
