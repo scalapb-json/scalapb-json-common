@@ -4,7 +4,7 @@ import com.google.protobuf.util.JsonFormat
 import scalapb.JavaProtoSupport
 import scalapb_json.ProtoMacros.getJavaClass
 import com.google.protobuf.Message.Builder
-import scala.quoted.{Expr, Type, Quotes}
+import scala.quoted.{Expr, Quotes, Type}
 import scala.reflect.ClassTag
 
 object ProtoMacrosJava {
