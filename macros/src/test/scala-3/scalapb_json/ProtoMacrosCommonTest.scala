@@ -13,8 +13,8 @@ import scala.quoted.FromExpr
 import scala.quoted.ToExpr
 import scala.quoted.Quotes
 import scala.quoted.staging.Compiler
-import scala.quoted.staging.run
 import scala.quoted.staging.withQuotes
+import scala.util.NotGiven
 
 object ProtoMacrosCommonTest extends Scalaprops {
 
@@ -42,12 +42,12 @@ object ProtoMacrosCommonTest extends Scalaprops {
 
   val test: Property = {
     given Compiler = Compiler.make(getClass.getClassLoader)
-    withQuotes(testImpl)
+    withQuotes(testImpl[Value])
   }
 
-  private[this] def testImpl(using Quotes): Property =
-    Property.forAll { (x1: Value) =>
-      val x2 = summon[FromExpr[Value]].unapply(Expr(x1))
+  private[this] def testImpl[A: Gen: FromExpr: ToExpr: NotGiven](using Quotes): Property =
+    Property.forAll { (x1: A) =>
+      val x2 = summon[FromExpr[A]].unapply(Expr(x1))
       assert(Some(x1) == x2, s"$x1 != $x2")
       true
     }
