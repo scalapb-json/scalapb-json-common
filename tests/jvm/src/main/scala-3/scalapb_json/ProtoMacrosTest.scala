@@ -8,27 +8,32 @@ import scala.compiletime.testing.{typeCheckErrors, ErrorKind}
 import scalapb_json.ProtoMacrosJava._
 
 object ProtoMacrosTest {
+
+  private[this] inline def checkTypeError(
+    src: String,
+    expectMessage: String
+  ) = {
+    typeCheckErrors(src) match {
+      case List(e) =>
+        assert(e.kind == ErrorKind.Typer, e)
+        assert(e.message.contains(expectMessage), e)
+      case other =>
+        fail("unexpected " + other)
+    }
+  }
+
   def main(args: Array[String]): Unit = {
     assert(StringValue.fromJsonConstant("abc") == StringValue("abc"))
 
-    typeCheckErrors(""" StringValue.fromJsonConstant("{") """) match {
-      case List(err) =>
-        assert(err.kind == ErrorKind.Typer)
-        assert(
-          err.message.contains("""com.google.protobuf.InvalidProtocolBufferException"""),
-          err.message
-        )
-      case other =>
-        sys.error(s"unexpected error ${other}")
-    }
+    checkTypeError(
+      """ StringValue.fromJsonConstant("{") """,
+      """com.google.protobuf.InvalidProtocolBufferException"""
+    )
 
-    typeCheckErrors(""" com.google.protobuf.struct.Struct.fromTextFormat("a") """) match {
-      case List(err) =>
-        assert(err.kind == ErrorKind.Typer)
-        assert(err.message.contains(""" Expected "{"."""), err.message)
-      case other =>
-        sys.error(s"unexpected error ${other}")
-    }
+    checkTypeError(
+      """ com.google.protobuf.struct.Struct.fromTextFormat("a") """,
+      """ Expected "{"."""
+    )
 
     val b = "b"
 
