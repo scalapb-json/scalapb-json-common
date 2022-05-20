@@ -224,7 +224,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .nativeSettings(
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M2",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M3",
     ),
     disableScala3, // TODO
   )
