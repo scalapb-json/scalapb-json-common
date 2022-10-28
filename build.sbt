@@ -226,7 +226,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.4.0",
     ),
-    disableScala3, // TODO
   )
 
 lazy val macros = project.settings(
