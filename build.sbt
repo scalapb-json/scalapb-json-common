@@ -178,7 +178,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       }
     },
     libraryDependencies ++= Seq(
-      "com.google.protobuf" % "protobuf-java-util" % "3.21.10" % "test"
+      "com.google.protobuf" % "protobuf-java-util" % "3.21.11" % "test"
     )
   )
   .jsSettings(
