@@ -220,7 +220,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     scalapropsCoreSettings,
     libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.9.1" % "test",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest-funspec" % scalatestVersion % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
   )
   .nativeSettings(
     libraryDependencies ++= Seq(
@@ -244,7 +245,8 @@ lazy val macros = project.settings(
   },
   libraryDependencies ++= Seq(
     "com.github.scalaprops" %%% "scalaprops" % "0.9.1" % "test",
-    "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+    "org.scalatest" %%% "scalatest-funspec" % scalatestVersion % "test",
+    "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
   ),
   libraryDependencies ++= {
     if (isScala3.value) {
@@ -263,7 +265,8 @@ lazy val macrosJava = project
     name := UpdateReadme.scalapbJsonMacrosJavaName,
     description := "Json/Protobuf convertor macros for ScalaPB with protobuf-java-util dependency",
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest" % scalatestVersion % "test",
+      "org.scalatest" %%% "scalatest-funspec" % scalatestVersion % "test",
+      "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
     )
   )
@@ -281,7 +284,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     },
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
-    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
+    libraryDependencies += "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion,
   )
   .jsSettings(
     Compile / scalaJSUseMainModuleInitializer := true,
