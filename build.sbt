@@ -158,7 +158,9 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     buildInfoPackage := "scalapb_json",
     buildInfoObject := "ScalapbJsonCommonBuildInfo",
     buildInfoKeys := Seq[BuildInfoKey](
-      "scalapbVersion" -> scalapbV,
+      "scalapbVersion" -> scalapbVersion
+    ),
+    buildInfoKeys ++= Seq[BuildInfoKey](
       scalaVersion,
       version
     )
