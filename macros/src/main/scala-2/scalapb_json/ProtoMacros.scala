@@ -16,7 +16,7 @@ object ProtoMacros {
       macro ProtoMacros.fromTextFormatDebugImpl
   }
 
-  def getJavaType(c: blackbox.Context)(tree: c.Tree): Class[_] = {
+  def getJavaType(c: blackbox.Context)(tree: c.Tree): Class[?] = {
     val fullName = tree.tpe.companion.typeSymbol.fullName
     Class.forName(fullName + "$").getMethods.filter { method =>
       // https://github.com/scalapb/ScalaPB/blob/v0.8.2/scalapb-runtime/shared/src/main/scala/scalapb/GeneratedMessageCompanion.scala#L189

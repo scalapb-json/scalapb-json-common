@@ -39,7 +39,7 @@ object ProtoMacrosJava {
 class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommon(c) {
   import c.universe._
 
-  private[this] def validate(json: String, clazz: Class[_]): Unit = {
+  private[this] def validate(json: String, clazz: Class[?]): Unit = {
     val parser = JsonFormat.parser()
     val builder =
       clazz.getMethod("newBuilder").invoke(null).asInstanceOf[com.google.protobuf.Message.Builder]
@@ -47,7 +47,7 @@ class ProtoMacrosJava(override val c: blackbox.Context) extends ProtoMacrosCommo
     builder.build()
   }
 
-  def fromJsonInternal(companion: c.Tree, json: c.Tree, javaType: Class[_]): c.Tree = {
+  def fromJsonInternal(companion: c.Tree, json: c.Tree, javaType: Class[?]): c.Tree = {
     val packageAndOuter = javaType.getCanonicalName.split('.').init
     val p = packageAndOuter.map(TermName(_)).foldLeft(Ident(TermName("_root_")): Tree)(Select(_, _))
     val x = Select(p, TermName(javaType.getSimpleName))
