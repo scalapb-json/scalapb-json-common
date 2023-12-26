@@ -135,6 +135,15 @@ val forkScalaCompiler = Def.task {
   )
 }
 
+val scalapbScala3Sources = Def.setting(
+  scalaBinaryVersion.value match {
+    case "2.12" =>
+      false
+    case _ =>
+      true
+  }
+)
+
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("core"))
   .enablePlugins(BuildInfoPlugin)
@@ -168,7 +177,10 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .jvmSettings(
     (Test / PB.targets) := Seq(
       PB.gens.java -> (Test / sourceManaged).value,
-      scalapb.gen(javaConversions = true) -> (Test / sourceManaged).value
+      scalapb.gen(
+        javaConversions = true,
+        scala3Sources = scalapbScala3Sources.value
+      ) -> (Test / sourceManaged).value
     ),
     compileOrder := {
       if (isScala3.value) {
@@ -216,7 +228,10 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       }
     },
     (Test / PB.targets) := Seq(
-      scalapb.gen(javaConversions = false) -> (Test / sourceManaged).value
+      scalapb.gen(
+        javaConversions = false,
+        scala3Sources = scalapbScala3Sources.value
+      ) -> (Test / sourceManaged).value
     ),
   )
   .settings(
