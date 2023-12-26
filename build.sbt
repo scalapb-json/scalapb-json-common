@@ -175,7 +175,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
   .jvmSettings(
-    (Test / PB.targets) := Seq(
+    (Test / PB.targets) ++= Seq[protocbridge.Target](
       PB.gens.java -> (Test / sourceManaged).value,
       scalapb.gen(
         javaConversions = true,
@@ -227,7 +227,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         ) / "scala",
       }
     },
-    (Test / PB.targets) := Seq(
+    (Test / PB.targets) ++= Seq[protocbridge.Target](
       scalapb.gen(
         javaConversions = false,
         scala3Sources = scalapbScala3Sources.value
