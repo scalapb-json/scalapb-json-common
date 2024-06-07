@@ -242,7 +242,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .nativeSettings(
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.5.0",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.6.0",
     ),
   )
 
@@ -363,7 +363,7 @@ lazy val commonSettings = Def.settings(
   libraryDependencies ++= Seq(
     "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % "0.8.2" % "test",
+    "com.lihaoyi" %%% "utest" % "0.8.3" % "test",
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   (Global / pomExtra) := {
