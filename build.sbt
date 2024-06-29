@@ -335,12 +335,17 @@ lazy val commonSettings = Def.settings(
     }
   },
   scalacOptions ++= {
-    if (isScala3.value) {
-      Nil
-    } else {
-      Seq(
-        "-Xsource:3",
-      )
+    scalaBinaryVersion.value match {
+      case "2.13" =>
+        Seq(
+          "-Xsource:3-cross",
+        )
+      case "2.12" =>
+        Seq(
+          "-Xsource:3",
+        )
+      case _ =>
+        Nil
     }
   },
   scalacOptions ++= {
