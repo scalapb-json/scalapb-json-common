@@ -18,7 +18,7 @@ import scala.util.NotGiven
 
 object ProtoMacrosCommonTest extends Scalaprops {
 
-  private[this] implicit val value1: Gen[Value] = {
+  private implicit val value1: Gen[Value] = {
     val primitive: Gen[Value] = Gen
       .oneOf(
         Gen.value(Value.Kind.Empty),
@@ -31,7 +31,7 @@ object ProtoMacrosCommonTest extends Scalaprops {
       .map(Value.apply(_))
 
     val list1: Gen[ListValue] = Gen.listOf(primitive).map(ListValue.apply(_))
-    val struct1: Gen[Struct] = Gen.mapGen(Gen.alphaNumString, primitive).map(Struct.apply(_))
+    val struct1: Gen[Struct] = Gen.mapGen(using Gen.alphaNumString, primitive).map(Struct.apply(_))
 
     Gen.oneOf(
       primitive,
@@ -45,7 +45,7 @@ object ProtoMacrosCommonTest extends Scalaprops {
     withQuotes(testImpl[Value])
   }
 
-  private[this] def testImpl[A: Gen: FromExpr: ToExpr: NotGiven](using Quotes): Property =
+  private def testImpl[A: Gen: FromExpr: ToExpr: NotGiven](using Quotes): Property =
     Property.forAll { (x1: A) =>
       val x2 = summon[FromExpr[A]].unapply(Expr(x1))
       assert(Some(x1) == x2, s"$x1 != $x2")

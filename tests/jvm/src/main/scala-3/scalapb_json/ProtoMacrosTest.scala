@@ -9,7 +9,7 @@ import scalapb_json.ProtoMacrosJava._
 
 object ProtoMacrosTest {
 
-  private[this] inline def checkTypeError(
+  private inline def checkTypeError(
     src: String,
     expectMessage: String
   ) = {
