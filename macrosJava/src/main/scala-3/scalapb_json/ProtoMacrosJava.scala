@@ -23,7 +23,7 @@ object ProtoMacrosJava {
     }
   }
 
-  private[this] def validate(json: String, clazz: Class[?]): Unit = {
+  private def validate(json: String, clazz: Class[?]): Unit = {
     val parser = JsonFormat.parser()
     val builder =
       clazz.getMethod("newBuilder").invoke(null).asInstanceOf[Builder]
