@@ -339,16 +339,6 @@ lazy val commonSettings = Def.settings(
         Nil
     }
   },
-  scalacOptions ++= {
-    if (scalaBinaryVersion.value == "2.13") {
-      Seq(
-        // TODO https://github.com/scalapb/ScalaPB/issues/1576
-        s"-Wconf:msg=inferred&cat=scala3-migration&src=target/scala-${scalaBinaryVersion.value}/.*:info",
-      )
-    } else {
-      Nil
-    }
-  },
   Seq(Compile, Test).flatMap(c => c / console / scalacOptions --= unusedWarnings),
   scalacOptions ++= Seq("-feature", "-deprecation", "-language:existentials"),
   licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
