@@ -182,15 +182,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         scala3Sources = scalapbScala3Sources.value
       ) -> (Test / sourceManaged).value
     ),
-    compileOrder := {
-      if (isScala3.value) {
-        // https://github.com/scala/scala3/issues/10956
-        // https://github.com/scala/scala3/issues/6138
-        CompileOrder.JavaThenScala
-      } else {
-        compileOrder.value
-      }
-    },
     libraryDependencies ++= Seq(
       "com.google.protobuf" % "protobuf-java-util" % "3.25.8" % "test"
     )
