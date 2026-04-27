@@ -232,6 +232,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     libraryDependencies += "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
   )
   .nativeSettings(
+    evictionErrorLevel := Level.Warn,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.6.0",
     ),
@@ -299,6 +300,9 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .platformsSettings(JSPlatform, NativePlatform)(
     disableScala3
+  )
+  .nativeSettings(
+    evictionErrorLevel := Level.Warn,
   )
   .configure(_ dependsOn (macros, macrosJava))
 
