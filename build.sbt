@@ -198,7 +198,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       }
     },
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.6.0",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.7.0",
     ),
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
@@ -234,7 +234,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .nativeSettings(
     evictionErrorLevel := Level.Warn,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.6.0",
+      "io.github.cquiroz" %%% "scala-java-time" % "2.7.0",
     ),
   )
 
