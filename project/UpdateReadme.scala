@@ -7,16 +7,15 @@ object UpdateReadme {
   val scalapbJsonMacrosName = "scalapb-json-macros"
   val scalapbJsonMacrosJavaName = "scalapb-json-macros-java"
 
-  val updateReadmeTask = { state: State =>
+  val updateReadmeTask: State => State = { state =>
     val extracted = Project.extract(state)
-    val v = extracted get version
-    val org = extracted get organization
+    val v = extracted.get(version)
+    val org = extracted.get(organization)
     val modules = scalapbJsonCommonName :: scalapbJsonMacrosName :: scalapbJsonMacrosJavaName :: Nil
     val readme = "README.md"
     val readmeFile = file(readme)
-    val newReadme = Predef
-      .augmentString(IO.read(readmeFile))
-      .lines
+    val newReadme = IO
+      .readLines(readmeFile)
       .map { line =>
         val matchReleaseOrSnapshot = line.contains("SNAPSHOT") == v.contains("SNAPSHOT")
         if (line.startsWith("libraryDependencies") && matchReleaseOrSnapshot) {
@@ -32,7 +31,7 @@ object UpdateReadme {
       }
       .mkString("", "\n", "\n")
     IO.write(readmeFile, newReadme)
-    val git = new Git(extracted get baseDirectory)
+    val git = new Git(extracted.get(baseDirectory))
     git.add(readme) ! state.log
     git.commit(message = "update " + readme, sign = false, signOff = false) ! state.log
     sys.process.Process("git diff HEAD^") ! state.log
