@@ -1,4 +1,4 @@
-import scalapb.compiler.Version._
+import scalapb.compiler.Version.{scalaBinaryVersion => _, _}
 import sbtrelease.ReleaseStateTransformations._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
@@ -18,7 +18,7 @@ val tagName = Def.setting {
 }
 
 val tagOrHash = Def.setting {
-  if (isSnapshot.value) sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  if (isSnapshot.value) sys.process.Process("git rev-parse HEAD").lazyLines_!.head
   else tagName.value
 }
 
@@ -51,11 +51,11 @@ lazy val disableScala3 = Def.settings(
       }
     )
   },
-  Test / test := {
+  Test / testFull := {
     if (isScala3.value) {
-      ()
+      TestResult.Empty
     } else {
-      (Test / test).value
+      (Test / testFull).value
     }
   },
   publish / skip := isScala3.value,
@@ -151,19 +151,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     commonSettings,
     name := UpdateReadme.scalapbJsonCommonName,
     description := "Json/Protobuf convertors for ScalaPB",
-    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map { f =>
-      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
-      val buildInfoDir = "sbt-buildinfo"
-      val path = if (f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackage.value) / f
-          .relativeTo((Compile / sourceManaged).value / buildInfoDir)
-          .get
-          .getPath).getPath
-      } else {
-        f.relativeTo((Compile / sourceManaged).value).get.getPath
-      }
-      (f, path)
-    },
     buildInfoPackage := "scalapb_json",
     buildInfoObject := "ScalapbJsonCommonBuildInfo",
     buildInfoKeys := Seq[BuildInfoKey](
@@ -198,7 +185,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       }
     },
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.7.0",
+      "io.github.cquiroz" %% "scala-java-time" % "2.7.0",
     ),
   )
   .platformsSettings(JVMPlatform, JSPlatform)(
@@ -227,14 +214,14 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .settings(
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %%% "scalaprops" % "0.11.0" % "test",
-    libraryDependencies += "org.scalatest" %%% "scalatest-funspec" % scalatestVersion % "test",
-    libraryDependencies += "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
+    libraryDependencies += "com.github.scalaprops" %% "scalaprops" % "0.11.0" % "test",
+    libraryDependencies += "org.scalatest" %% "scalatest-funspec" % scalatestVersion % "test",
+    libraryDependencies += "org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test",
   )
   .nativeSettings(
     evictionErrorLevel := Level.Warn,
     libraryDependencies ++= Seq(
-      "io.github.cquiroz" %%% "scala-java-time" % "2.7.0",
+      "io.github.cquiroz" %% "scala-java-time" % "2.7.0",
     ),
   )
 
@@ -253,9 +240,9 @@ lazy val macros = project.settings(
     }
   },
   libraryDependencies ++= Seq(
-    "com.github.scalaprops" %%% "scalaprops" % "0.11.0" % "test",
-    "org.scalatest" %%% "scalatest-funspec" % scalatestVersion % "test",
-    "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
+    "com.github.scalaprops" %% "scalaprops" % "0.11.0" % "test",
+    "org.scalatest" %% "scalatest-funspec" % scalatestVersion % "test",
+    "org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test",
   ),
   libraryDependencies ++= {
     if (isScala3.value) {
@@ -274,8 +261,8 @@ lazy val macrosJava = project
     name := UpdateReadme.scalapbJsonMacrosJavaName,
     description := "Json/Protobuf convertor macros for ScalaPB with protobuf-java-util dependency",
     libraryDependencies ++= Seq(
-      "org.scalatest" %%% "scalatest-funspec" % scalatestVersion % "test",
-      "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion % "test",
+      "org.scalatest" %% "scalatest-funspec" % scalatestVersion % "test",
+      "org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test",
       "com.google.protobuf" % "protobuf-java-util" % protobufVersion,
     )
   )
@@ -287,13 +274,13 @@ lazy val macrosJava = project
 lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     commonSettings,
-    compilers := forkScalaCompiler.value,
+    compilers := Def.uncached(forkScalaCompiler.value),
     Seq(Compile, Test).map { x =>
       x / doc := target.value / "dummy-doc-file"
     },
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
-    libraryDependencies += "org.scalatest" %%% "scalatest-shouldmatchers" % scalatestVersion,
+    libraryDependencies += "org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion,
   )
   .jsSettings(
     Compile / scalaJSUseMainModuleInitializer := true,
@@ -318,6 +305,7 @@ lazy val noPublish = Seq(
 )
 
 lazy val commonSettings = Def.settings(
+  exportJars := false,
   scalapbV := scalapbVersion,
   (Compile / unmanagedResources) += (LocalRootProject / baseDirectory).value / "LICENSE.txt",
   scalaVersion := Scala212,
@@ -347,13 +335,13 @@ lazy val commonSettings = Def.settings(
   scalacOptions ++= Seq("-feature", "-deprecation", "-language:existentials"),
   licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
   organization := "io.github.scalapb-json",
-  Project.inConfig(Test)(sbtprotoc.ProtocPlugin.protobufConfigSettings),
+  ProjectExtra.inConfig(Test)(sbtprotoc.ProtocPlugin.protobufConfigSettings),
   Compile / PB.targets := Nil,
   (Test / PB.protoSources) := Seq(baseDirectory.value.getParentFile / "shared/src/test/protobuf"),
   libraryDependencies ++= Seq(
-    "com.thesamet.scalapb" %%% "scalapb-runtime" % scalapbV.value,
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value,
     "com.thesamet.scalapb" %% "scalapb-runtime" % scalapbV.value % "protobuf,test",
-    "com.lihaoyi" %%% "utest" % "0.8.4" % "test",
+    "com.lihaoyi" %% "utest" % "0.8.4" % "test",
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   Global / pomExtra := (
@@ -413,5 +401,7 @@ lazy val commonSettings = Def.settings(
 val coreJVM = core.jvm
 val coreJS = core.js
 
-commonSettings
-noPublish
+lazy val scalapbJsonCommonRoot = rootProject.autoAggregate.settings(
+  commonSettings,
+  noPublish,
+)
