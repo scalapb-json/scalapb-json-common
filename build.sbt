@@ -206,7 +206,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       x / unmanagedSourceDirectories += {
         baseDirectory.value.getParentFile / "jvm-js" / "src" / Defaults.nameForSrc(
           x.name
-        ) / "scala",
+        ) / "scala"
       }
     },
   )
@@ -215,7 +215,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       x / unmanagedSourceDirectories += {
         baseDirectory.value.getParentFile / "js-native" / "src" / Defaults.nameForSrc(
           x.name
-        ) / "scala",
+        ) / "scala"
       }
     },
     (Test / PB.targets) ++= Seq[protocbridge.Target](
@@ -289,7 +289,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     commonSettings,
     compilers := forkScalaCompiler.value,
     Seq(Compile, Test).map { x =>
-      x / doc := target.value / "dummy-doc-file",
+      x / doc := target.value / "dummy-doc-file"
     },
     Compile / mainClass := Some("scalapb_json.ProtoMacrosTest"),
     noPublish,
@@ -304,7 +304,7 @@ lazy val tests = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .nativeSettings(
     evictionErrorLevel := Level.Warn,
   )
-  .configure(_ dependsOn (macros, macrosJava))
+  .configure(_.dependsOn(macros, macrosJava))
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
@@ -356,22 +356,22 @@ lazy val commonSettings = Def.settings(
     "com.lihaoyi" %%% "utest" % "0.8.4" % "test",
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
-  (Global / pomExtra) := {
+  Global / pomExtra := (
     <url>https://github.com/scalapb-json/scalapb-json-common</url>
-      <scm>
-        <connection>scm:git:github.com/scalapb-json/scalapb-json-common.git</connection>
-        <developerConnection>scm:git:git@github.com:scalapb-json/scalapb-json-common.git</developerConnection>
-        <url>github.com/scalapb-json/scalapb-json-common.git</url>
-        <tag>{tagOrHash.value}</tag>
-      </scm>
-      <developers>
-        <developer>
-          <id>xuwei-k</id>
-          <name>Kenji Yoshida</name>
-          <url>https://github.com/xuwei-k</url>
-        </developer>
-      </developers>
-  },
+    <scm>
+      <connection>scm:git:github.com/scalapb-json/scalapb-json-common.git</connection>
+      <developerConnection>scm:git:git@github.com:scalapb-json/scalapb-json-common.git</developerConnection>
+      <url>github.com/scalapb-json/scalapb-json-common.git</url>
+      <tag>{tagOrHash.value}</tag>
+    </scm>
+    <developers>
+      <developer>
+        <id>xuwei-k</id>
+        <name>Kenji Yoshida</name>
+        <url>https://github.com/xuwei-k</url>
+      </developer>
+    </developers>
+  ),
   publishTo := (if (isSnapshot.value) None else localStaging.value),
   (Compile / doc / scalacOptions) ++= {
     val t = tagOrHash.value
@@ -396,7 +396,7 @@ lazy val commonSettings = Def.settings(
     tagRelease,
     ReleaseStep(
       action = { state =>
-        val extracted = Project extract state
+        val extracted = Project.extract(state)
         extracted
           .runAggregated(extracted.get(thisProjectRef) / (Global / PgpKeys.publishSigned), state)
       },
