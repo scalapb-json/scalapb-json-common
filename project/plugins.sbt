@@ -12,7 +12,7 @@ addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.3.2")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.6.2")
 
-addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.8")
+addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.1.0-RC2")
 
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.12")
 
