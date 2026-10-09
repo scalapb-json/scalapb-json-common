@@ -6,7 +6,7 @@ import utest._
 
 object TypeRegistrySpec extends TestSuite {
   val tests = Tests {
-    "addFile should add all messages in the file" - {
+    test("addFile should add all messages in the file") {
       val reg = TypeRegistry().addFile(Test3Proto)
 
       assert(reg.findType("type.googleapis.com/jsontest.MyTest3") == Some(MyTest3))
@@ -15,7 +15,7 @@ object TypeRegistrySpec extends TestSuite {
       assert(reg.findType("type.googleapis.com/something.else") == None)
     }
 
-    "addMessage should not add other messages from same file" - {
+    test("addMessage should not add other messages from same file") {
       val reg = TypeRegistry().addMessage[MyTest3]
       assert(reg.findType("type.googleapis.com/jsontest.MyTest3") == Some(MyTest3))
       assert(reg.findType("type.googleapis.com/jsontest.Wrapper") == None)

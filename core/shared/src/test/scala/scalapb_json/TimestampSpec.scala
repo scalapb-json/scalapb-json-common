@@ -5,7 +5,7 @@ import utest._
 
 object TimestampSpec extends TestSuite {
   val tests = Tests {
-    "Timestamp parser should work" - {
+    test("Timestamp parser should work") {
       val start = Timestamps.parseTimestamp("0001-01-01T00:00:00Z")
       val end = Timestamps.parseTimestamp("9999-12-31T23:59:59.999999999Z")
       assert(start.seconds == Timestamps.TIMESTAMP_SECONDS_MIN)
