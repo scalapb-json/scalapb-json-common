@@ -214,7 +214,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .settings(
     scalapropsCoreSettings,
-    libraryDependencies += "com.github.scalaprops" %% "scalaprops" % "0.12.0" % "test",
+    libraryDependencies += "com.github.scalaprops" %% "scalaprops" % "0.12.1" % "test",
     libraryDependencies += "org.scalatest" %% "scalatest-funspec" % scalatestVersion % "test",
     libraryDependencies += "org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test",
   )
@@ -240,7 +240,7 @@ lazy val macros = project.settings(
     }
   },
   libraryDependencies ++= Seq(
-    "com.github.scalaprops" %% "scalaprops" % "0.12.0" % "test",
+    "com.github.scalaprops" %% "scalaprops" % "0.12.1" % "test",
     "org.scalatest" %% "scalatest-funspec" % scalatestVersion % "test",
     "org.scalatest" %% "scalatest-shouldmatchers" % scalatestVersion % "test",
   ),
